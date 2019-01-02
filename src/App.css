@@ -1,0 +1,16 @@
+#root{
+  height: 100%;
+}
+
+.clearfix::after{
+  content: ' ';
+  display: block;
+  clear: both;
+}
+
+.fl{
+  float: left;
+}
+.fr{
+  float: right;
+}

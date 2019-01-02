@@ -1,0 +1,26 @@
+[
+  {
+    "id": "1",
+    "name": "首页",
+    "icon": "home",
+    "inMenu": true,
+    "isMenu": true,
+    "path": "/home"
+  },
+  {
+    "id": "2",
+    "name": "用户管理",
+    "icon": "user",
+    "inMenu": true,
+    "isMenu": true,
+    "path": "/userManage"
+  },
+  {
+    "id": "3",
+    "name": "数据元管理",
+    "icon": "bars",
+    "inMenu": true,
+    "isMenu": true,
+    "path": "/metadataManage"
+  }
+]
