@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Divider, Button, Input, Modal, Form, Select, Switch } from 'antd'
+import { Card, Table, Divider, Button, Input, Modal, Form, Select, Switch, Popconfirm } from 'antd'
 const { Column } = Table
 const { Search } = Input
 
@@ -9,28 +9,39 @@ class Metadata extends PureComponent {
     super(props)
     this.state = {
       data: [],
-      visible: false
+      visible: false,
+      amendVisible: false,
+      isEdit: false
     }
   }
   componentDidMount () {
     this.data = [{
       key: '1',
+      title: '所属',
       name: 'John Brown',
-      age: 32,
-      address: 'New York No. 1 Lake Park',
-      tags: ['nice', 'developer']
+      des: '描述',
+      type: '类型',
+      jdbcUrl: '链接',
+      userName: '用户名',
+      pw: '密码'
     }, {
       key: '2',
+      title: '所属',
       name: 'Jim Green',
-      age: 42,
-      address: 'London No. 1 Lake Park',
-      tags: ['loser']
+      des: '描述',
+      type: '类型',
+      jdbcUrl: '链接',
+      userName: '用户名',
+      pw: '密码'
     }, {
       key: '3',
+      title: '所属',
       name: 'Joe Black',
-      age: 32,
-      address: 'Sidney No. 1 Lake Park',
-      tags: ['cool', 'teacher']
+      des: '描述',
+      type: '类型',
+      jdbcUrl: '链接',
+      userName: '用户名',
+      pw: '密码'
     }]
     this.setState({ data: this.data })
   }
@@ -42,9 +53,21 @@ class Metadata extends PureComponent {
   }
   handleCancel = () => {
     this.setState({ visible: false })
+    this.setState({ amendVisible: false })
   }
   handleOk = () => {
     this.setState({ visible: false })
+    this.setState({ amendVisible: false })
+  }
+  amend = (record) => {
+    console.log(record)
+    this.setState({ amendVisible: true })
+  }
+  handleDelete = (key) => {
+    console.log('删除这条数据' + key)
+    const data = [...this.state.data]
+    console.log(data[0])
+    this.setState({ data: data.filter(item => item.key !== key) })
   }
   render () {
     return (
@@ -63,28 +86,56 @@ class Metadata extends PureComponent {
           </div>
           <Table dataSource={this.state.data}>
             <Column
-              title='Name'
+              title='标题'
+              dataIndex='title'
+              key='title'
+            />
+            <Column
+              title='数据库名称'
               dataIndex='name'
               key='name'
             />
             <Column
-              title='Age'
-              dataIndex='age'
-              key='age'
+              title='描述'
+              dataIndex='des'
+              key='des'
             />
             <Column
-              title='Address'
-              dataIndex='address'
-              key='address'
+              title='类型'
+              dataIndex='type'
+              key='type'
             />
             <Column
-              title='Action'
+              title='链接地址'
+              dataIndex='jdbcUrl'
+              key='jdbcUrl'
+            />
+            <Column
+              title='用户名'
+              dataIndex='userName'
+              key='userName'
+            />
+            <Column
+              title='密码'
+              dataIndex='pw'
+              key='pw'
+            />
+            <Column
+              title='状态'
+              dataIndex='state'
+              key='state'
+            />
+            <Column
+              title='操作'
               key='action'
               render={(text, record) => (
                 <span>
-                  <a href='javascript:;'>修改</a>
+                  {/* <a href='javascript:;' onClick={() => this.setState({ amendVisible: true })}>修改</a> */}
+                  <a href='javascript:;' onClick={() => this.amend(record)}>修改</a>
                   <Divider type='vertical' />
-                  <a href='javascript:;'>删除</a>
+                  <Popconfirm title='确定删除?' onConfirm={() => this.handleDelete(record.key)}>
+                    <a href='javascript:;'>删除</a>
+                  </Popconfirm>
                 </span>
               )}
             />
@@ -98,6 +149,15 @@ class Metadata extends PureComponent {
           footer={null}
         >
           <WrappedForm handleBack={this.handleOk} />
+        </Modal>
+        <Modal
+          title='修改'
+          width='600px'
+          visible={this.state.amendVisible}
+          onCancel={this.handleCancel}
+          footer={null}
+        >
+          <WrappedForm handleBack={this.handleOk} isEdit={this.isEdit} />
         </Modal>
       </div>
     )
@@ -114,6 +174,7 @@ class AddMetadata extends PureComponent {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       console.log(values)
+      console.log(this.props.isEdit)
       if (!err) {
         this.props.handleBack()
       }
@@ -189,7 +250,7 @@ class AddMetadata extends PureComponent {
           label='密码'
           {...formItemSettings}
         >
-          {getFieldDecorator('jdbcUrl', {
+          {getFieldDecorator('pw', {
             rules: [{ required: true, message: '请输入密码' }]
           })(
             <Input />
@@ -217,7 +278,8 @@ class AddMetadata extends PureComponent {
 
 AddMetadata.propTypes = {
   form: PropTypes.object,
-  handleBack: PropTypes.func
+  handleBack: PropTypes.func,
+  isEdit: PropTypes.bool
 }
 
 const WrappedForm = Form.create()(AddMetadata)
