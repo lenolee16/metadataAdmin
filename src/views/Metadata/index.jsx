@@ -13,7 +13,8 @@ class Metadata extends PureComponent {
       visible: false,
       amendVisible: false,
       isEdit: false,
-      loading: false
+      loading: false,
+      formData: null
     }
   }
   componentDidMount () {
@@ -50,6 +51,7 @@ class Metadata extends PureComponent {
     }]
     this.setState({ data: this.data })
     // this.initData()
+    // this.wrappedForm.current.focusTextInput()
   }
   filter = (val) => {
     if (!val) {
@@ -102,8 +104,8 @@ class Metadata extends PureComponent {
     // this.props.form.setFieldsValue({
     //   note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`
     // })
-    console.log(this.wrappedForm.current)
-    this.setState({ amendVisible: true })
+
+    this.setState({ amendVisible: true, formData: record })
   }
   // 测试数据源
   testFnc = (data) => {
@@ -203,7 +205,7 @@ class Metadata extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm ref={this.wrappedForm} handleBack={this.handleOk} isEdit={this.isEdit} />
+          <WrappedForm formData={this.state.formData} handleBack={this.handleOk} isEdit={this.isEdit} />
         </Modal>
       </div>
     )
@@ -226,6 +228,18 @@ class AddMetadata extends PureComponent {
         // this.props.form.resetFields()
       }
     })
+  }
+  componentDidMount () {
+    if (this.props.formData) {
+      setTimeout(() => {
+        this.setData(this.props.formData)
+      }, 0)
+    }
+  }
+  setData (data) {
+    const { dataSourceId, ..._data } = data
+    console.log(_data)
+    this.props.form.setFieldsValue(_data)
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -255,7 +269,7 @@ class AddMetadata extends PureComponent {
           label='数据库描述'
           {...formItemSettings}
         >
-          {getFieldDecorator('des', {
+          {getFieldDecorator('description', {
             rules: [{ required: false, message: '请输入数据库描述' }]
           })(
             <Input />
@@ -265,7 +279,7 @@ class AddMetadata extends PureComponent {
           label='数据库类型'
           {...formItemSettings}
         >
-          {getFieldDecorator('type', {
+          {getFieldDecorator('dbType', {
             rules: [{ required: true, message: '请选择数据库类型' }]
           })(
             <Select
@@ -311,7 +325,7 @@ class AddMetadata extends PureComponent {
           {...formItemSettings}
           label='状态'
         >
-          {getFieldDecorator('switch', { valuePropName: 'checked', initialValue: true })(
+          {getFieldDecorator('status', { valuePropName: 'checked', initialValue: true })(
             <Switch />
           )}
         </Form.Item>
@@ -330,7 +344,8 @@ class AddMetadata extends PureComponent {
 AddMetadata.propTypes = {
   form: PropTypes.object,
   handleBack: PropTypes.func,
-  isEdit: PropTypes.bool
+  isEdit: PropTypes.bool,
+  formData: PropTypes.any
 }
 
 const WrappedForm = Form.create()(AddMetadata)
