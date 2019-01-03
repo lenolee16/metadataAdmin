@@ -17,10 +17,26 @@
   },
   {
     "id": "3",
-    "name": "数据元管理",
-    "icon": "bars",
+    "name": "数据源管理",
+    "icon": "setting",
     "inMenu": true,
     "isMenu": true,
     "path": "/metadataManage"
+  },
+  {
+    "id": "4",
+    "name": "数据源同步",
+    "icon": "diff",
+    "inMenu": true,
+    "isMenu": true,
+    "path": "/metadataList"
+  },
+  {
+    "id": "5",
+    "name": "快捷搜索",
+    "icon": "search",
+    "inMenu": true,
+    "isMenu": true,
+    "path": "/metadataSearch"
   }
 ]

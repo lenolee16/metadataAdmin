@@ -1,11 +1,11 @@
 import React, { PureComponent } from 'react'
 import { Card } from 'antd'
 
-class MetadataSearch extends PureComponent {
+class MetadataTableList extends PureComponent {
   render () {
     return (
       <div className='MetadataSearch'>
-        <Card title='数据源搜索'>
+        <Card title='数据表'>
           <p>111</p>
         </Card>
       </div>
@@ -13,4 +13,4 @@ class MetadataSearch extends PureComponent {
   }
 }
 
-export default MetadataSearch
+export default MetadataTableList

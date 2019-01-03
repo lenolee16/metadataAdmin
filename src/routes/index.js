@@ -4,10 +4,10 @@ import MainView from 'views/MainView'
 import SyncView from 'views/SyncView'
 import UserManage from 'views/User'
 import MetadataManage from 'views/Metadata'
-import MetadataSearch from 'views/Metadata/search'
-import MetadataList from 'views/Metadata/list'
-import MetadataBaseList from 'views/Metadata/database'
-import MetadataTableList from 'views/Metadata/datatable'
+import MetadataSearch from 'views/Metadata/Search'
+import MetadataList from 'views/Metadata/Compare'
+import MetadataTableList from 'views/Metadata/Compare/table'
+import MetadataColumnList from 'views/Metadata/Compare/column'
 
 // https://reactjs.org/docs/code-splitting.html#suspense
 const AsyncView = React.lazy(() => import(/* webpackChunkName: "async" */ 'views/AsyncView'))
@@ -39,11 +39,11 @@ const routes = [
   },
   {
     path: '/metadataList/:databaseId',
-    component: MetadataBaseList
+    component: MetadataTableList
   },
   {
     path: '/metadataList/:databaseId/:id',
-    component: MetadataTableList
+    component: MetadataColumnList
   },
   {
     path: '/metadataSearch',
