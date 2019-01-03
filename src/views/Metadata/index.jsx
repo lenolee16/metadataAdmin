@@ -16,27 +16,27 @@ class Metadata extends PureComponent {
   }
   componentDidMount () {
     this.data = [{
-      key: '1',
+      id: '1',
       title: '所属',
-      name: 'John Brown',
+      dbName: 'John Brown',
       des: '描述',
       type: '类型',
       jdbcUrl: '链接',
       userName: '用户名',
       pw: '密码'
     }, {
-      key: '2',
+      id: '2',
       title: '所属',
-      name: 'Jim Green',
+      dbName: 'Jim Green',
       des: '描述',
       type: '类型',
       jdbcUrl: '链接',
       userName: '用户名',
       pw: '密码'
     }, {
-      key: '3',
+      id: '3',
       title: '所属',
-      name: 'Joe Black',
+      dbName: 'Joe Black',
       des: '描述',
       type: '类型',
       jdbcUrl: '链接',
@@ -55,12 +55,22 @@ class Metadata extends PureComponent {
     this.setState({ visible: false })
     this.setState({ amendVisible: false })
   }
-  handleOk = () => {
+  handleOk = (data) => {
     this.setState({ visible: false })
     this.setState({ amendVisible: false })
+    console.log(data)
+    // this.setState({ data: Object.assign(this.data, data) })
+    data.id = 10
+    console.log(data)
+    console.log(this.data)
+    this.setState({ data: [...this.data, data] })
   }
   amend = (record) => {
     console.log(record)
+    // this.props.form.setFieldsValue({
+    //   note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`
+    // })
+    console.log(this.refs.wrappedForm)
     this.setState({ amendVisible: true })
   }
   handleDelete = (key) => {
@@ -92,8 +102,8 @@ class Metadata extends PureComponent {
             />
             <Column
               title='数据库名称'
-              dataIndex='name'
-              key='name'
+              dataIndex='dbName'
+              key='dbName'
             />
             <Column
               title='描述'
@@ -133,7 +143,7 @@ class Metadata extends PureComponent {
                   {/* <a href='javascript:;' onClick={() => this.setState({ amendVisible: true })}>修改</a> */}
                   <a href='javascript:;' onClick={() => this.amend(record)}>修改</a>
                   <Divider type='vertical' />
-                  <Popconfirm title='确定删除?' onConfirm={() => this.handleDelete(record.key)}>
+                  <Popconfirm title='确定删除?' onConfirm={() => this.handleDelete(record.id)}>
                     <a href='javascript:;'>删除</a>
                   </Popconfirm>
                 </span>
@@ -157,7 +167,7 @@ class Metadata extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm handleBack={this.handleOk} isEdit={this.isEdit} />
+          <WrappedForm ref='wrappedForm' handleBack={this.handleOk} isEdit={this.isEdit} />
         </Modal>
       </div>
     )
@@ -174,9 +184,10 @@ class AddMetadata extends PureComponent {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       console.log(values)
-      console.log(this.props.isEdit)
+      console.log(!err)
       if (!err) {
-        this.props.handleBack()
+        this.props.handleBack(values)
+        // this.props.form.resetFields()
       }
     })
   }
@@ -208,13 +219,17 @@ class AddMetadata extends PureComponent {
           label='数据库描述'
           {...formItemSettings}
         >
-          <Input />
+          {getFieldDecorator('des', {
+            rules: [{ required: false, message: '请输入数据库描述' }]
+          })(
+            <Input />
+          )}
         </Form.Item>
         <Form.Item
           label='数据库类型'
           {...formItemSettings}
         >
-          {getFieldDecorator('gender', {
+          {getFieldDecorator('type', {
             rules: [{ required: true, message: '请选择数据库类型' }]
           })(
             <Select
@@ -240,7 +255,7 @@ class AddMetadata extends PureComponent {
           label='用户名'
           {...formItemSettings}
         >
-          {getFieldDecorator('user', {
+          {getFieldDecorator('userName', {
             rules: [{ required: true, message: '请输入用户名' }]
           })(
             <Input />
