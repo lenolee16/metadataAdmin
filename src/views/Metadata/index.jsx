@@ -1,55 +1,77 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Divider, Button, Input, Modal, Form, Select, Switch, Popconfirm } from 'antd'
+import { Card, Table, Button, Input, Modal, Form, Select, Switch, Divider } from 'antd'
 const { Column } = Table
 const { Search } = Input
 
 class Metadata extends PureComponent {
   constructor (props) {
     super(props)
+    this.wrappedForm = React.createRef()
     this.state = {
       data: [],
       visible: false,
       amendVisible: false,
-      isEdit: false
+      isEdit: false,
+      loading: false
     }
   }
   componentDidMount () {
     this.data = [{
-      id: '1',
+      dataSourceId: '1',
       title: '所属',
       dbName: 'John Brown',
-      des: '描述',
-      type: '类型',
+      description: '描述',
+      dbType: '类型',
       jdbcUrl: '链接',
-      userName: '用户名',
-      pw: '密码'
+      status: '0',
+      user: '用户名',
+      password: '密码'
     }, {
-      id: '2',
+      dataSourceId: '2',
       title: '所属',
       dbName: 'Jim Green',
-      des: '描述',
-      type: '类型',
+      description: '描述',
+      dbType: '类型',
       jdbcUrl: '链接',
-      userName: '用户名',
-      pw: '密码'
+      status: '0',
+      user: '用户名',
+      password: '密码'
     }, {
-      id: '3',
+      dataSourceId: '3',
       title: '所属',
       dbName: 'Joe Black',
-      des: '描述',
-      type: '类型',
+      description: '描述',
+      dbType: '类型',
       jdbcUrl: '链接',
-      userName: '用户名',
-      pw: '密码'
+      status: '0',
+      user: '用户名',
+      password: '密码'
     }]
     this.setState({ data: this.data })
+    // this.initData()
   }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.data.filter(item => item.name.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    this.setState({ data: this.data.filter(item => item.dbName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+  }
+  // 初始化table
+  initData = () => {
+    this.setState({ loading: true })
+    window._http.post('/metadata/dataSource/list').then(res => {
+      if (res.data.code === 0) {
+        this.setState({
+          data: res.data.data,
+          loading: false
+        })
+      } else {
+        this.setState({ loading: false })
+      }
+    }).catch(res => {
+      this.setState({ loading: false })
+    })
   }
   handleCancel = () => {
     this.setState({ visible: false })
@@ -58,26 +80,43 @@ class Metadata extends PureComponent {
   handleOk = (data) => {
     this.setState({ visible: false })
     this.setState({ amendVisible: false })
-    console.log(data)
-    // this.setState({ data: Object.assign(this.data, data) })
-    data.id = 10
-    console.log(data)
-    console.log(this.data)
-    this.setState({ data: [...this.data, data] })
+    data.dataSourceId = this.data.length + 1
+    const newData = this.data
+    newData.push(data)
+    this.setState({ data: newData })
+
+    this.setState({ loading: true })
+    window._http.post('/metadata/dataSource/add', data).then(res => {
+      if (res.data.code === 0) {
+        this.setState({ loading: false })
+        this.initData()
+      } else {
+        this.setState({ loading: false })
+      }
+    }).catch(res => {
+      this.setState({ loading: false })
+    })
   }
   amend = (record) => {
     console.log(record)
     // this.props.form.setFieldsValue({
     //   note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`
     // })
-    console.log(this.refs.wrappedForm)
+    console.log(this.wrappedForm.current)
     this.setState({ amendVisible: true })
   }
-  handleDelete = (key) => {
-    console.log('删除这条数据' + key)
-    const data = [...this.state.data]
-    console.log(data[0])
-    this.setState({ data: data.filter(item => item.key !== key) })
+  // 测试数据源
+  testFnc = (data) => {
+    console.log()
+    window._http.post('/metadata/dataSource/test', { dataSourceId: data.dataSourceId }).then(res => {
+      if (res.data.code === 0) {
+        window._message.success('请求成功')
+      } else {
+        window._message.error('请求失败')
+      }
+    }).catch(err => {
+      window._message.error(err)
+    })
   }
   render () {
     return (
@@ -94,7 +133,7 @@ class Metadata extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table dataSource={this.state.data}>
+          <Table rowKey='dataSourceId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='标题'
               dataIndex='title'
@@ -107,12 +146,12 @@ class Metadata extends PureComponent {
             />
             <Column
               title='描述'
-              dataIndex='des'
+              dataIndex='description'
               key='des'
             />
             <Column
               title='类型'
-              dataIndex='type'
+              dataIndex='dbtype'
               key='type'
             />
             <Column
@@ -122,17 +161,17 @@ class Metadata extends PureComponent {
             />
             <Column
               title='用户名'
-              dataIndex='userName'
-              key='userName'
+              dataIndex='user'
+              key='user'
             />
             <Column
               title='密码'
-              dataIndex='pw'
-              key='pw'
+              dataIndex='password'
+              key='password'
             />
             <Column
               title='状态'
-              dataIndex='state'
+              dataIndex='status'
               key='state'
             />
             <Column
@@ -140,12 +179,9 @@ class Metadata extends PureComponent {
               key='action'
               render={(text, record) => (
                 <span>
-                  {/* <a href='javascript:;' onClick={() => this.setState({ amendVisible: true })}>修改</a> */}
                   <a href='javascript:;' onClick={() => this.amend(record)}>修改</a>
                   <Divider type='vertical' />
-                  <Popconfirm title='确定删除?' onConfirm={() => this.handleDelete(record.id)}>
-                    <a href='javascript:;'>删除</a>
-                  </Popconfirm>
+                  <a href='javascript:;' onClick={() => this.testFnc(record)}>测试</a>
                 </span>
               )}
             />
@@ -167,7 +203,7 @@ class Metadata extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm ref='wrappedForm' handleBack={this.handleOk} isEdit={this.isEdit} />
+          <WrappedForm ref={this.wrappedForm} handleBack={this.handleOk} isEdit={this.isEdit} />
         </Modal>
       </div>
     )
@@ -255,7 +291,7 @@ class AddMetadata extends PureComponent {
           label='用户名'
           {...formItemSettings}
         >
-          {getFieldDecorator('userName', {
+          {getFieldDecorator('user', {
             rules: [{ required: true, message: '请输入用户名' }]
           })(
             <Input />
@@ -265,7 +301,7 @@ class AddMetadata extends PureComponent {
           label='密码'
           {...formItemSettings}
         >
-          {getFieldDecorator('pw', {
+          {getFieldDecorator('password', {
             rules: [{ required: true, message: '请输入密码' }]
           })(
             <Input />
