@@ -35,15 +35,18 @@ const routes = [
   },
   {
     path: '/metadataList',
-    component: MetadataList
+    component: MetadataList,
+    exact: true
   },
   {
     path: '/metadataList/:databaseId',
-    component: MetadataTableList
+    component: MetadataTableList,
+    exact: true
   },
   {
     path: '/metadataList/:databaseId/:id',
-    component: MetadataColumnList
+    component: MetadataColumnList,
+    exact: true
   },
   {
     path: '/metadataSearch',

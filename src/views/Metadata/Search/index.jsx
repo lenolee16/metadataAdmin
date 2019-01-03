@@ -68,7 +68,7 @@ class MetadataSearch extends PureComponent {
                 key='action'
                 render={(text, record) => (
                   <span>
-                    <Link to={`/metadataList/${record.dataSourceId}/${record.targetTableId}${record.targetFieldId ? ('/' + record.targetFieldId) : record.targetFieldId}`}>查看</Link>
+                    <Link to={`/metadataList/${record.dataSourceId}/${record.targetTableId}`}>查看</Link>
                   </span>
                 )}
               />
