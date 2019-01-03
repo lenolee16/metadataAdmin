@@ -28,6 +28,14 @@ const routes = [
   {
     path: '/metadataManage',
     component: MetadataManage
+  },
+  {
+    path: '/metadataList',
+    component: MetadataManage
+  },
+  {
+    path: '/metadataSearch',
+    component: MetadataManage
   }
 ]
 
