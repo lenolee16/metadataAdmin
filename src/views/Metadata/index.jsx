@@ -23,7 +23,7 @@ class Metadata extends PureComponent {
       title: '所属',
       dbName: 'John Brown',
       description: '描述',
-      dbType: '类型',
+      dbType: 'mysql',
       jdbcUrl: '链接',
       status: '0',
       user: '用户名',
@@ -33,7 +33,7 @@ class Metadata extends PureComponent {
       title: '所属',
       dbName: 'Jim Green',
       description: '描述',
-      dbType: '类型',
+      dbType: 'mysql',
       jdbcUrl: '链接',
       status: '0',
       user: '用户名',
@@ -43,7 +43,7 @@ class Metadata extends PureComponent {
       title: '所属',
       dbName: 'Joe Black',
       description: '描述',
-      dbType: '类型',
+      dbType: 'mysql',
       jdbcUrl: '链接',
       status: '0',
       user: '用户名',
@@ -62,7 +62,10 @@ class Metadata extends PureComponent {
   // 初始化table
   initData = () => {
     this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/list').then(res => {
+    window._http.post('/metadata/dataSource/list', {
+      'data': {},
+      'extra': {}
+    }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -76,19 +79,27 @@ class Metadata extends PureComponent {
     })
   }
   handleCancel = () => {
-    this.setState({ visible: false })
-    this.setState({ amendVisible: false })
+    this.setState({
+      visible: false,
+      amendVisible: false
+    })
   }
+  // 添加
   handleOk = (data) => {
-    this.setState({ visible: false })
-    this.setState({ amendVisible: false })
-    data.dataSourceId = this.data.length + 1
-    const newData = this.data
-    newData.push(data)
-    this.setState({ data: newData })
-
-    this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/add', data).then(res => {
+    this.setState({
+      visible: false,
+      loading: true
+    })
+    // data.dataSourceId = this.data.length + 1
+    // const newData = this.data
+    // newData.push(data)
+    // this.setState({ data: newData })
+    // http://10.31.21.22:8080/metadata_manager_api
+    data.status = data.status ? 1 : 0
+    window._http.post('/metadata/dataSource/add', {
+      ...data,
+      'extra': {}
+    }).then(res => {
       if (res.data.code === 0) {
         this.setState({ loading: false })
         this.initData()
@@ -97,6 +108,12 @@ class Metadata extends PureComponent {
       }
     }).catch(res => {
       this.setState({ loading: false })
+    })
+  }
+  // 修改
+  handleAmend = (data) => {
+    this.setState({
+      amendVisible: false
     })
   }
   amend = (record) => {
@@ -152,8 +169,8 @@ class Metadata extends PureComponent {
               key='des'
             />
             <Column
-              title='类型'
-              dataIndex='dbtype'
+              title='数据库类型'
+              dataIndex='dbType'
               key='type'
             />
             <Column
@@ -205,7 +222,7 @@ class Metadata extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm formData={this.state.formData} handleBack={this.handleOk} isEdit={this.isEdit} />
+          <WrappedForm formData={this.state.formData} handleBack={this.handleAmend} isEdit={this.isEdit} />
         </Modal>
       </div>
     )
@@ -286,8 +303,8 @@ class AddMetadata extends PureComponent {
               placeholder='请选择数据库类型'
               onChange={this.handleSelectChange}
             >
-              <Select.Option value='mysql'>mysql</Select.Option>
-              <Select.Option value='sqlserver'>sqlserver</Select.Option>
+              <Select.Option value='1'>mysql</Select.Option>
+              <Select.Option value='2'>sqlserver</Select.Option>
             </Select>
           )}
         </Form.Item>
