@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import { Card, Table, Button, Input } from 'antd'
 import { Link } from 'react-router-dom'
+import utils from 'utils'
 const { Column } = Table
 const { Search } = Input
 class MetadataList extends PureComponent {
@@ -75,15 +76,16 @@ initData = () => {
 }
 // 同步 /metadata/dataSource/sync
 sync = (data) => {
+  utils.loading.show()
   window._http.post('/metadata/dataSource/sync', { dataSourceId: data.dataSourceId }).then(res => {
+    utils.loading.hide()
     if (res.data.code === 0) {
       window._message.success('同步成功')
     } else {
       window._message.error('同步失败')
     }
-  }).catch(err => {
-    console.log(err)
-    window._message.error(err)
+  }).catch(() => {
+    utils.loading.hide()
   })
 }
 render () {
