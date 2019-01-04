@@ -1,7 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Button, Input, Form, Switch, Modal, Table } from 'antd'
-// import utils from 'utils'
+import utils from 'utils'
 
 const { Search } = Input
 const { Column } = Table
@@ -16,7 +16,8 @@ class MetadataColumnList extends PureComponent {
         pageSize: 10,
         current: 1
       },
-      formData: null
+      formData: null,
+      loading: false
     }
   }
   filter = (val) => {
@@ -26,12 +27,13 @@ class MetadataColumnList extends PureComponent {
     this.setState({ data: this.data.filter(item => item.fieldName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   componentDidMount () {
-    console.log(this)
     this.queryData()
   }
   queryData () {
     const { params: { databaseId } } = this.props.match
+    this.setState({ loading: true })
     window._http.post('/metadata/targetField/compareField', { targetTableId: databaseId }).then(res => {
+      this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
         const pager = this.state.pagination
@@ -39,6 +41,8 @@ class MetadataColumnList extends PureComponent {
         this.setState({ pagination: pager })
         this.partPage(1)
       }
+    }).catch(() => {
+      this.setState({ loading: false })
     })
   }
   handleTableChange = (pagination, filters, sorter) => {
@@ -62,16 +66,16 @@ class MetadataColumnList extends PureComponent {
     this.setState({ visible: true, formData: data })
   }
   sync = (data) => {
-    // utils.loading.show()
+    utils.loading.show()
     window._http.post('/metadata/targetField/compareField', { targetFieldId: data.targetFieldId }).then(res => {
-      // utils.loading.hide()
+      utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
       } else {
         window._message.success('同步失败！')
       }
     }).catch(res => {
-      // utils.loading.hide()
+      utils.loading.hide()
     })
   }
   render () {
