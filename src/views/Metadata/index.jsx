@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Modal, Form, Select, Switch, Divider } from 'antd'
+import { Card, Table, Button, Input, Modal, Form, Select, Switch } from 'antd'
 const { Column } = Table
 const { Search } = Input
 
@@ -62,10 +62,7 @@ class Metadata extends PureComponent {
   // 初始化table
   initData = () => {
     this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/list', {
-      'data': {},
-      'extra': {}
-    }).then(res => {
+    window._http.post('/metadata/dataSource/list').then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -126,14 +123,15 @@ class Metadata extends PureComponent {
   }
   // 测试数据源
   testFnc = (data) => {
-    console.log()
+    console.log(data)
     window._http.post('/metadata/dataSource/test', { dataSourceId: data.dataSourceId }).then(res => {
       if (res.data.code === 0) {
-        window._message.success('请求成功')
+        window._notification.success('请求成功')
       } else {
-        window._message.error('请求失败')
+        window._notification.error('请求失败')
       }
     }).catch(err => {
+      console.log(err)
       window._message.error(err)
     })
   }
@@ -197,11 +195,10 @@ class Metadata extends PureComponent {
               title='操作'
               key='action'
               render={(text, record) => (
-                <span>
-                  <a href='javascript:;' onClick={() => this.amend(record)}>修改</a>
-                  <Divider type='vertical' />
-                  <a href='javascript:;' onClick={() => this.testFnc(record)}>测试</a>
-                </span>
+                <>
+                  <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
+                  <Button type='primary' ghost icon='file-sync' style={{ color: 'green', borderColor: 'green' }} onClick={() => this.testFnc(record)}>测试</Button>
+                </>
               )}
             />
           </Table>
