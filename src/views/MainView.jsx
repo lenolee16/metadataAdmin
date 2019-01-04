@@ -1,13 +1,19 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { renderRoutes } from 'react-router-config'
-import { Layout } from 'antd'
+import { connect } from 'react-redux'
+import { Layout, Spin } from 'antd'
 import { routes } from 'routes'
 import LeftMenu from 'components/Layout/LeftMenu/index'
 import Headers from 'components/Layout/Header/index'
 import './MainView.less'
 
 const { Sider, Content, Header } = Layout
+
+const mapStateToProps = state => ({
+  loading: state.loading.globalLoading
+})
+
 class MainView extends React.PureComponent {
   constructor (props) {
     super(props)
@@ -27,9 +33,11 @@ class MainView extends React.PureComponent {
           <Header style={{ backgroundColor: '#fff' }} >
             <Headers />
           </Header>
-          <Content className='app-content'>
-            {renderRoutes(routes)}
-          </Content>
+          <Spin spinning={this.props.loading}>
+            <Content className='app-content'>
+              {renderRoutes(routes)}
+            </Content>
+          </Spin>
         </Layout>
       </Layout>
     )
@@ -37,7 +45,10 @@ class MainView extends React.PureComponent {
 }
 
 MainView.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
+  loading: PropTypes.bool
 }
 
-export default MainView
+export default connect(
+  mapStateToProps
+)(MainView)
