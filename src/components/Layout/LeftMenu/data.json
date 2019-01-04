@@ -1,21 +1,5 @@
 [
   {
-    "id": "1",
-    "name": "首页",
-    "icon": "home",
-    "inMenu": true,
-    "isMenu": true,
-    "path": "/home"
-  },
-  {
-    "id": "2",
-    "name": "用户管理",
-    "icon": "user",
-    "inMenu": true,
-    "isMenu": true,
-    "path": "/userManage"
-  },
-  {
     "id": "3",
     "name": "数据源管理",
     "icon": "setting",
@@ -29,7 +13,27 @@
     "icon": "diff",
     "inMenu": true,
     "isMenu": true,
-    "path": "/metadataList"
+    "path": "/metadataList",
+    "children": [
+      {
+        "id": "41",
+        "name": "数据表",
+        "icon": "",
+        "inMenu": false,
+        "isMenu": false,
+        "path": "/metadataList/:id",
+        "children": [
+          {
+            "id": "411",
+            "name": "数据列",
+            "icon": "",
+            "inMenu": false,
+            "isMenu": false,
+            "path": "/metadataList/:id/:id"
+          }
+        ]
+      }
+    ]
   },
   {
     "id": "5",

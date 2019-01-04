@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { Switch, Route } from 'react-router-dom'
 import MainView from 'views/MainView'
-import SyncView from 'views/SyncView'
+import Home from 'views/Home'
 import UserManage from 'views/User'
 import MetadataManage from 'views/Metadata'
 import MetadataSearch from 'views/Metadata/Search'
@@ -14,16 +14,9 @@ const AsyncView = React.lazy(() => import(/* webpackChunkName: "async" */ 'views
 
 const routes = [
   {
-    path: '/sync',
-    component: SyncView
-  },
-  {
-    path: '/async',
-    component: () => (
-      <Suspense fallback={<div>Loading</div>}>
-        <AsyncView />
-      </Suspense>
-    )
+    path: '/',
+    component: Home,
+    exact: true
   },
   {
     path: '/userManage',
@@ -51,6 +44,14 @@ const routes = [
   {
     path: '/metadataSearch',
     component: MetadataSearch
+  },
+  {
+    path: '/async',
+    component: () => (
+      <Suspense fallback={<div>Loading</div>}>
+        <AsyncView />
+      </Suspense>
+    )
   }
 ]
 

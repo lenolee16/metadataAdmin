@@ -1,22 +1,18 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { matchPath } from 'react-router'
 import { Link } from 'react-router-dom'
 import { Menu, Icon } from 'antd'
+import { hasChildren } from 'utils/matchRoute'
 import menuData from './data.json'
 
 const isActive = (path, location) => {
-  return matchPath(path, {
-    path: location.pathname,
-    exact: true,
-    strict: false
-  })
+  return location.pathname.indexOf(path) === 0
 }
 class LeftMenu extends React.Component {
   constructor (props) {
     super(props)
     this.state = {
-      selectKey: '1',
+      selectKey: '/metadataManage',
       openKey: null
     }
   }
@@ -24,13 +20,14 @@ class LeftMenu extends React.Component {
     let { selectKey, openKey } = this.state
     let renderMenu = (list, subkey) => {
       return list.map(item => {
+        if (!item.inMenu) return false
         if (item.path && isActive(item.path, this.props.location)) {
-          selectKey = item.id
+          selectKey = item.path
           openKey = subkey
         }
-        return (item.children && Array.isArray(item.children) && item.children.length) ? <Menu.SubMenu key={item.id} title={<><Icon type={item.icon} />{item.name}</>} >
+        return (item.children && Array.isArray(item.children) && hasChildren(item.children)) ? <Menu.SubMenu key={item.path} title={<><Icon type={item.icon} />{item.name}</>} >
           {renderMenu(item.children, item.id)}
-        </Menu.SubMenu> : <Menu.Item key={item.id}>
+        </Menu.SubMenu> : <Menu.Item key={item.path}>
           <Link to={item.path} replace={this.props.location.pathname === item.path}>
             <Icon type={item.icon} />
             <span>{item.name}</span>
