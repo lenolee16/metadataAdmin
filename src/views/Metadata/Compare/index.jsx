@@ -75,7 +75,7 @@ initData = () => {
 }
 // 同步 /metadata/dataSource/sync
 sync = (data) => {
-  window._http.post('/metadata/dataSource/syne', { dataSourceId: data.dataSourceId }).then(res => {
+  window._http.post('/metadata/dataSource/sync', { dataSourceId: data.dataSourceId }).then(res => {
     if (res.data.code === 0) {
       window._message.success('同步成功')
     } else {

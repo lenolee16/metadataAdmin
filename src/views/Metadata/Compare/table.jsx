@@ -17,35 +17,23 @@ class MetadataTableList extends PureComponent {
   }
   componentDidMount () {
     this.data = [{
-      dataSourceId: '1',
-      title: '所属',
-      dbName: 'John Brown',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
+      targetTableId: '1',
+      tableName: 'John Brown',
+      targetComment: '目标注释',
+      targetStatus: '目标状态',
+      currentComment: '当前注释',
+      currentStatus: '当前状态',
+      compareComment: '对比注释',
+      compareStatus: '对比状态'
     }, {
-      dataSourceId: '2',
-      title: '所属',
-      dbName: 'Jim Green',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '3',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
+      targetTableId: '2',
+      tableName: 'ssssss',
+      targetComment: '目标注释',
+      targetStatus: '目标状态',
+      currentComment: '当前注释',
+      currentStatus: '当前状态',
+      compareComment: '对比注释',
+      compareStatus: '对比状态'
     }]
     this.setState({ data: this.data })
   // this.initData()
@@ -55,7 +43,7 @@ class MetadataTableList extends PureComponent {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.data.filter(item => item.dbName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    this.setState({ data: this.data.filter(item => item.tableName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   // 初始化table
   initData = () => {
@@ -93,67 +81,58 @@ class MetadataTableList extends PureComponent {
   render () {
     return (
       <div className='MetadataSearch'>
-        {/* <Card title='数据表'>
-            <p>111</p>
-          </Card> */}
-
         <Card title='数据表'>
           <div className='clearfix' style={{ marginBottom: 12 }}>
             <Search
               className='fr'
-              placeholder='源数据库名称'
+              placeholder='数据表名称'
               onSearch={this.filter}
               style={{ width: 200 }}
             />
           </div>
           <Table rowKey='targetTableId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
-              title='标题'
-              dataIndex='title'
-              key='title'
+              title='数据表名称'
+              dataIndex='tableName'
+              key='tableName'
             />
             <Column
-              title='数据库名称'
-              dataIndex='dbName'
-              key='dbName'
+              title='目标注释'
+              dataIndex='targetComment'
+              key='targetComment'
             />
             <Column
-              title='描述'
-              dataIndex='description'
-              key='des'
+              title='目标状态'
+              dataIndex='targetStatus'
+              key='targetStatus'
             />
             <Column
-              title='数据库类型'
-              dataIndex='dbType'
-              key='type'
+              title='当前注释'
+              dataIndex='currentComment'
+              key='currentComment'
             />
             <Column
-              title='链接地址'
-              dataIndex='jdbcUrl'
-              key='jdbcUrl'
+              title='当前状态'
+              dataIndex='currentStatus'
+              key='currentStatus'
             />
             <Column
-              title='用户名'
-              dataIndex='user'
-              key='user'
+              title='对比注释'
+              dataIndex='compareComment'
+              key='compareComment'
             />
             <Column
-              title='密码'
-              dataIndex='password'
-              key='password'
-            />
-            <Column
-              title='状态'
-              dataIndex='status'
-              key='state'
+              title='对比状态'
+              dataIndex='compareStatus'
+              key='compareStatus'
             />
             <Column
               title='操作'
               key='action'
               render={(text, record) => (
                   <>
-                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
                     <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
+                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
                     <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
