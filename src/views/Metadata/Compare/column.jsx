@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react'
+import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Button, Input, Form, Switch, Modal, Table } from 'antd'
 import utils from 'utils'
@@ -64,6 +64,9 @@ class MetadataColumnList extends PureComponent {
   }
   edit = (data) => {
     this.setState({ visible: true, formData: data })
+    setTimeout(() => {
+      this.form.setForm(data)
+    }, 0)
   }
   sync = (data) => {
     utils.loading.show()
@@ -124,7 +127,7 @@ class MetadataColumnList extends PureComponent {
               key='action'
               render={(text, record) => (
                 <>
-                  <Button type='primary' icon='edit' ghost style={{ marginRight: '10px' }} onClick={(record) => this.edit(record)}>修改</Button>
+                  <Button type='primary' icon='edit' ghost style={{ marginRight: '10px' }} onClick={() => this.edit(record)}>修改</Button>
                   <Button type='danger' icon='sync' ghost onClick={(record) => this.sync(record)}>同步</Button>
                 </>
               )}
@@ -138,7 +141,7 @@ class MetadataColumnList extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm handleBack={this.handleOk} formData={this.state.formData} />
+          <WrappedForm handleBack={this.handleOk} wrappedComponentRef={(form) => { this.form = form }} formData={this.state.formData} />
         </Modal>
       </div>
     )
@@ -154,7 +157,7 @@ const formItemSettings = {
   wrapperCol: { span: 12 }
 }
 
-class AddMetadata extends PureComponent {
+class AddMetadata extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
@@ -183,13 +186,11 @@ class AddMetadata extends PureComponent {
       }
     })
   }
-  componentDidMount () {
-    if (this.props.formData) {
-      const { targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status } = this.props.formData
-      this.props.form.setFieldsValue({
-        targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status: !!status
-      })
-    }
+  setForm = (data) => {
+    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status } = data
+    this.props.form.setFieldsValue({
+      targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status: !!status
+    })
   }
   render () {
     const { getFieldDecorator } = this.props.form
