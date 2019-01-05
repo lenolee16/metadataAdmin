@@ -1,9 +1,9 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Form, Modal } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag } from 'antd'
 import { Link } from 'react-router-dom'
 import utils from 'utils'
-const { Column } = Table
+const { Column, ColumnGroup } = Table
 const { Search } = Input
 
 class MetadataTableList extends PureComponent {
@@ -12,6 +12,7 @@ class MetadataTableList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
+      // 数据源id
       dataSourceId: '1',
       loading: false
       // formData: null
@@ -20,22 +21,30 @@ class MetadataTableList extends PureComponent {
   componentDidMount () {
     this.data = [{
       targetTableId: '1',
-      tableName: 'John Brown',
-      targetComment: '目标注释',
-      targetStatus: '目标状态',
-      currentComment: '当前注释',
-      currentStatus: '当前状态',
-      compareComment: '对比注释',
-      compareStatus: '对比状态'
+      tableName: 'tablesName',
+      targetComment: 'targetComment',
+      targetStatus: '1',
+      currentComment: 'currentComment',
+      currentStatus: '1',
+      currentToTarget: 'currentToTarget',
+      currentToTargetTxt: 'currentToTargetTxt',
+      compareComment: 'compareComment',
+      compareStatus: '1',
+      compareToCurrent: 'compareToCurrent',
+      compareToCurrentTxt: 'compareToCurrentTxt'
     }, {
       targetTableId: '2',
-      tableName: 'tableName',
-      targetComment: 'targetComment',
-      targetStatus: 'targetStatus',
-      currentComment: 'currentComment',
-      currentStatus: 'currentStatus',
-      compareComment: 'compareComment',
-      compareStatus: 'compareStatus'
+      tableName: '数据表名',
+      targetComment: '目标注释',
+      targetStatus: '1',
+      currentComment: '当前注释',
+      currentStatus: '1',
+      currentToTarget: '当前版本',
+      currentToTargetTxt: '当前版本内容',
+      compareComment: '上一次注释',
+      compareStatus: '1',
+      compareToCurrent: '上一次版本',
+      compareToCurrentTxt: '上一次版本内容'
     }]
     this.setState({ data: this.data })
     this.initData()
@@ -50,7 +59,7 @@ class MetadataTableList extends PureComponent {
   initData = () => {
     const { params: { databaseId } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/list', { dataSourceId: databaseId }).then(res => {
+    window._http.post('/metadata/dataSource/list', { sourceDatabaseId: databaseId }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -108,6 +117,16 @@ class MetadataTableList extends PureComponent {
       visible: false
     })
   }
+  // 判断颜色 0无变化 1表存在变化 2表属性是否变化 3表字段有无删减 4表字段属性有无变化
+  renderColor = (status) => {
+    console.log(status)
+    const tagMap = {
+      0: '',
+      3: 'green',
+      4: 'red'
+    }
+    return tagMap[status]
+  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -120,49 +139,111 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetTableId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table bordered rowKey='targetTableId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='数据表名称'
               dataIndex='tableName'
               key='tableName'
             />
-            <Column
-              title='目标注释'
-              dataIndex='targetComment'
-              key='targetComment'
-            />
-            <Column
-              title='目标状态'
-              dataIndex='targetStatus'
-              key='targetStatus'
-            />
-            <Column
-              title='当前注释'
-              dataIndex='currentComment'
-              key='currentComment'
-            />
-            <Column
-              title='当前状态'
-              dataIndex='currentStatus'
-              key='currentStatus'
-            />
-            <Column
-              title='对比注释'
-              dataIndex='compareComment'
-              key='compareComment'
-            />
-            <Column
-              title='对比状态'
-              dataIndex='compareStatus'
-              key='compareStatus'
-            />
+            <ColumnGroup title='目标版本' >
+              <Column
+                title='注释'
+                dataIndex='targetComment'
+                key='targetComment'
+              />
+              <Column
+                title='状态'
+                dataIndex='targetStatus'
+                key='targetStatus'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.targetStatus ? '存在' : '不存在'}</Tag>
+                  </>
+                )}
+              />
+            </ColumnGroup>
+            <ColumnGroup title='当前快照与目标版本对比' >
+              <Column
+                title='注释'
+                dataIndex='currentComment'
+                key='currentComment'
+              />
+              <Column
+                title='状态'
+                dataIndex='currentStatus'
+                key='currentStatus'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.currentStatus ? '存在' : '不存在'}</Tag>
+                  </>
+                )}
+              />
+              <Column
+                title='版本变化'
+                dataIndex='currentToTarget'
+                key='currentToTarget'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.currentToTarget}</Tag>
+                  </>
+                )}
+              />
+              <Column
+                title='版本内容变化'
+                dataIndex='currentToTargetTxt'
+                key='currentToTargetTxt'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
+                  </>
+                )}
+              />
+            </ColumnGroup>
+            <ColumnGroup title='上一次快照与当前快照对比'>
+              <Column
+                title='注释'
+                dataIndex='compareComment'
+                key='compareComment'
+              />
+              <Column
+                title='状态'
+                dataIndex='compareStatus'
+                key='compareStatus'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.compareStatus ? '存在' : '不存在'}</Tag>
+                  </>
+                )}
+              />
+              <Column
+                title='版本变化'
+                dataIndex='compareToCurrent'
+                key='compareToCurrent'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.compareToCurrent}</Tag>
+                  </>
+                )}
+              />
+              <Column
+                title='版本内容变化'
+                dataIndex='compareToCurrentTxt'
+                key='compareToCurrentTxt'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
+                  </>
+                )}
+              />
+            </ColumnGroup>
             <Column
               title='操作'
               key='action'
+              width='200'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
-                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
+                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginBottom: '5px' }} >查看</Button></Link>
+                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginBottom: '5px' }}>修改</Button>
                     <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
