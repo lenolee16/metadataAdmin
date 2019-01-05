@@ -1,6 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
 import { Link } from 'react-router-dom'
 import utils from 'utils'
 const { Column, ColumnGroup } = Table
@@ -24,14 +24,17 @@ class MetadataTableList extends PureComponent {
       tableName: 'tablesName',
       targetComment: 'targetComment',
       targetStatus: '1',
+      targetVersionNo: '12245.15425.54',
       currentComment: 'currentComment',
       currentStatus: '1',
       currentToTarget: '3',
       currentToTargetTxt: '表存在变化',
+      compareVersionNo: '121.155.125',
       compareComment: 'compareComment',
       compareStatus: '1',
-      compareToCurrent: '4',
+      compareToCurrent: '2',
       compareToCurrentTxt: '表字段存在变化',
+      currentVersionNo: '125.125.152',
       targetTable: {
         targetTableId: 0,
         sourceDbId: 0,
@@ -46,14 +49,17 @@ class MetadataTableList extends PureComponent {
       tableName: '数据表名',
       targetComment: '目标注释',
       targetStatus: '1',
+      targetVersionNo: '12245.15425.54',
       currentComment: '当前注释',
       currentStatus: '1',
       currentToTarget: '4',
       currentToTargetTxt: '表字段有变化',
+      currentVersionNo: '125.125.152',
       compareComment: '上一次注释',
       compareStatus: '1',
-      compareToCurrent: '3',
+      compareToCurrent: '1',
       compareToCurrentTxt: '有变化',
+      compareVersionNo: '121.155.125',
       targetTable: {
         targetTableId: 1,
         sourceDbId: 0,
@@ -141,12 +147,21 @@ class MetadataTableList extends PureComponent {
   renderColor = (status) => {
     const tagMap = {
       0: '',
-      1: '',
-      2: '',
-      3: 'green',
-      4: 'red'
+      1: 'green',
+      2: 'red',
+      3: 'blue',
+      4: 'blue'
     }
     return tagMap[status]
+  }
+  // 目标版本号
+  renderPopover = (data) => {
+    console.log(data)
+    return (
+      <div className='Popover'>
+        <p>表注释：{data.targetComment}</p>
+      </div>
+    )
   }
   render () {
     return (
@@ -168,16 +183,34 @@ class MetadataTableList extends PureComponent {
             />
             <ColumnGroup title='目标版本' >
               <Column
-                title='目标版本注释'
-                dataIndex='targetComment'
-                key='targetComment'
+                title='目标版本号'
+                dataIndex='targetVersionNo'
+                key='targetVersionNo'
+                render={(text, values) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                        {values.targetVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
             </ColumnGroup>
             <ColumnGroup title='当前快照与目标版本对比' >
               <Column
-                title='对比注释'
-                dataIndex='currentComment'
-                key='currentComment'
+                title='当前版本号'
+                dataIndex='currentVersionNo'
+                key='currentVersionNo'
+                render={(text, values) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                        {values.currentVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
               <Column
                 title='状态'
@@ -192,9 +225,18 @@ class MetadataTableList extends PureComponent {
             </ColumnGroup>
             <ColumnGroup title='上一次快照与当前快照对比'>
               <Column
-                title='对比注释'
-                dataIndex='compareComment'
-                key='compareComment'
+                title='上一次版本号'
+                dataIndex='compareVersionNo'
+                key='compareVersionNo'
+                render={(text, values) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                        {values.compareVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
               <Column
                 title='状态'
@@ -213,9 +255,9 @@ class MetadataTableList extends PureComponent {
               width='200'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' size='small' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
-                    <Button type='primary' size='small' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
-                    <Button type='danger' size='small' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
+                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
+                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
             />
