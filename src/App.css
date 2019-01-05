@@ -14,3 +14,9 @@
 .fr{
   float: right;
 }
+.Popover{
+  font-size: 12px;
+}
+.Popover p{
+  margin-bottom: 5px;
+}

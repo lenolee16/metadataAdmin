@@ -1,6 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Button, Input, Form, Switch, Modal, Table, Tag } from 'antd'
+import { Card, Button, Input, Form, Switch, Modal, Table, Tag, Radio, Popover, Icon } from 'antd'
 import utils from 'utils'
 
 const { Search } = Input
@@ -30,9 +30,9 @@ class MetadataColumnList extends PureComponent {
     this.queryData()
   }
   queryData () {
-    const { params: { databaseId } } = this.props.match
+    const { params: { databaseId, id } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/targetField/compareField', { targetTableId: databaseId }).then(res => {
+    window._http.post('/metadata/targetField/compareField', { sourceDatabaseId: databaseId, sourceTableId: id }).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
@@ -67,14 +67,15 @@ class MetadataColumnList extends PureComponent {
     this.queryData()
   }
   edit = (data) => {
-    this.setState({ visible: true, formDataId: data.targetFieldId })
+    this.setState({ visible: true, formDataId: data.targetFieldName })
     setTimeout(() => {
-      this.form.setForm(data)
+      this.form.setForm(data.targetField)
     }, 0)
   }
   sync = (data) => {
     utils.loading.show()
-    window._http.post('/metadata/sourceField/sync', { targetFieldId: data.targetFieldId }).then(res => {
+    const { params: { databaseId, id } } = this.props.match
+    window._http.post('/metadata/sourceField/sync', { sourceDatabaseId: databaseId, sourceTableId: id, targetFieldName: data.targetFieldName }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
@@ -93,6 +94,28 @@ class MetadataColumnList extends PureComponent {
     }
     return tagMap[status]
   }
+  renderPopover = (data) => {
+    return (
+      <div className='Popover'>
+        <p>字段类型：{data.fieldType}</p>
+        <p>是否主键：{data.fieldPri ? '是' : '否'}</p>
+        <p>字段注释：{data.fieldComment}</p>
+        <p>字段长度：{data.fieldSize}</p>
+        <p>默认值：{data.fieldDefault}</p>
+      </div>
+    )
+  }
+  renderTargetPopover = (data) => {
+    return (
+      <div className='Popover'>
+        <p>字段类型：{data.targetFieldType}</p>
+        <p>是否主键：{data.targetFieldPri ? '是' : '否'}</p>
+        <p>字段注释：{data.targetFieldComment}</p>
+        <p>字段长度：{data.targetFieldSize}</p>
+        <p>默认值：{data.targetDefaultValue}</p>
+      </div>
+    )
+  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -108,24 +131,42 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='fieldName' bordered pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
+          <Table rowKey='targetFieldName' bordered pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
             <Column
               title='字段名称'
-              dataIndex='fieldName'
-              key='fieldName'
+              dataIndex='targetFieldName'
+              key='targetFieldName'
             />
             <ColumnGroup title='目标'>
               <Column
-                title='目标注释'
-                dataIndex='targetComment'
-                key='targetComment'
+                title='目标版本号'
+                dataIndex='targetField'
+                key='targetField'
+                render={(text) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderTargetPopover(text)} title='详情'>
+                        {text.targetVereseionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
             </ColumnGroup>
             <ColumnGroup title='当前快照'>
               <Column
-                title='当前注释'
-                dataIndex='currentComment'
-                key='currentComment'
+                title='当前版本号'
+                dataIndex='currentField'
+                key='currentField'
+                render={(text) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderPopover(text)} title='详情'>
+                        {text.sourceVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
               <Column
                 title='当前状态'
@@ -140,9 +181,18 @@ class MetadataColumnList extends PureComponent {
             </ColumnGroup>
             <ColumnGroup title='上一次快照'>
               <Column
-                title='上一次注释'
-                dataIndex='compareComment'
-                key='compareComment'
+                title='上一次版本号'
+                dataIndex='compareField'
+                key='compareField'
+                render={(text) => (
+                  <>
+                    {
+                      text ? <Popover content={this.renderPopover(text)} title='详情'>
+                        {text.sourceVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                      </Popover> : '-'
+                    }
+                  </>
+                )}
               />
               <Column
                 title='上一次状态'
@@ -160,8 +210,8 @@ class MetadataColumnList extends PureComponent {
               key='action'
               render={(text, record) => (
                 <>
-                  <Button type='primary' icon='edit' ghost style={{ marginRight: '10px' }} onClick={() => this.edit(record)}>修改</Button>
-                  <Button type='danger' icon='sync' ghost onClick={(record) => this.sync(record)}>同步</Button>
+                  <Button type='primary' icon='edit' disabled={!record.targetField} ghost style={{ marginRight: '10px' }} onClick={() => this.edit(record)}>修改</Button>
+                  <Button type='danger' icon='sync' ghost onClick={() => this.sync(record)}>同步</Button>
                 </>
               )}
             />
@@ -174,7 +224,7 @@ class MetadataColumnList extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm handleBack={this.handleOk} wrappedComponentRef={(form) => { this.form = form }} formDataId={this.state.formDataId} />
+          <WrappedForm handleBack={this.handleOk} match={this.props.match} wrappedComponentRef={(form) => { this.form = form }} formDataId={this.state.formDataId} />
         </Modal>
       </div>
     )
@@ -195,8 +245,9 @@ class AddMetadata extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        const { params: { databaseId, id } } = this.props.match
         if (this.props.formDataId !== null) {
-          window._http.post(`/metadata/targetField/update`, { targetFieldId: this.props.formDataId, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/update`, { sourceDatabaseId: databaseId, sourceTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -206,7 +257,7 @@ class AddMetadata extends Component {
             }
           })
         } else {
-          window._http.post(`/metadata/targetField/add`, values).then(res => {
+          window._http.post(`/metadata/targetField/add`, { sourceDatabaseId: databaseId, sourceTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -220,9 +271,9 @@ class AddMetadata extends Component {
     })
   }
   setForm = (data) => {
-    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status } = data
+    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDefaultValue, status } = data
     this.props.form.setFieldsValue({
-      targetFieldName, targetFieldType, targetFieldComment, targetFieldSize, targetDefaultValue, status: !!status
+      targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDefaultValue, status: !!status
     })
   }
   render () {
@@ -247,6 +298,19 @@ class AddMetadata extends Component {
             rules: [{ required: true, message: '请输入字段类型' }]
           })(
             <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='是否是主键'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetFieldPri', {
+            initialValue: 0
+          })(
+            <Radio.Group>
+              <Radio value={1}>是</Radio>
+              <Radio value={0}>否</Radio>
+            </Radio.Group>
           )}
         </Form.Item>
         <Form.Item
@@ -302,7 +366,8 @@ class AddMetadata extends Component {
 AddMetadata.propTypes = {
   form: PropTypes.object,
   handleBack: PropTypes.func,
-  formDataId: PropTypes.any
+  formDataId: PropTypes.any,
+  match: PropTypes.object
 }
 
 const WrappedForm = Form.create()(AddMetadata)
