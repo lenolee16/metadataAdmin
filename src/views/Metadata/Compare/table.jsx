@@ -1,6 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Form, Modal, Tag } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
 import { Link } from 'react-router-dom'
 import utils from 'utils'
 const { Column, ColumnGroup } = Table
@@ -26,12 +26,21 @@ class MetadataTableList extends PureComponent {
       targetStatus: '1',
       currentComment: 'currentComment',
       currentStatus: '1',
-      currentToTarget: '0',
-      currentToTargetTxt: 'currentToTargetTxt',
+      currentToTarget: '3',
+      currentToTargetTxt: '表存在变化',
       compareComment: 'compareComment',
       compareStatus: '1',
-      compareToCurrent: '2',
-      compareToCurrentTxt: 'compareToCurrentTxt'
+      compareToCurrent: '4',
+      compareToCurrentTxt: '表字段存在变化',
+      targetTable: {
+        targetTableId: 0,
+        sourceDbId: 0,
+        sourceTableName: 'string',
+        status: 0,
+        targetComment: 'string',
+        tableName: 'string',
+        targetVersionNo: 0
+      }
     }, {
       targetTableId: '2',
       tableName: '数据表名',
@@ -39,12 +48,21 @@ class MetadataTableList extends PureComponent {
       targetStatus: '1',
       currentComment: '当前注释',
       currentStatus: '1',
-      currentToTarget: '0',
-      currentToTargetTxt: '当前版本内容',
+      currentToTarget: '4',
+      currentToTargetTxt: '表字段有变化',
       compareComment: '上一次注释',
       compareStatus: '1',
-      compareToCurrent: '2',
-      compareToCurrentTxt: '上一次版本内容'
+      compareToCurrent: '3',
+      compareToCurrentTxt: '有变化',
+      targetTable: {
+        targetTableId: 1,
+        sourceDbId: 0,
+        sourceTableName: 'string',
+        status: 0,
+        targetComment: 'string',
+        tableName: 'string',
+        targetVersionNo: 0
+      }
     }]
     this.setState({ data: this.data })
     this.initData()
@@ -89,17 +107,19 @@ class MetadataTableList extends PureComponent {
   // 修改
   amend = (data) => {
     console.log('我在修改')
-    this.setState({
-      visible: true
-    })
+    if (data.targetTable && data.targetTable.targetTableId === null) {
+      return window._message.error('目标表id不存在，无法修改！')
+    }
+    this.setState({ visible: true })
     setTimeout(() => {
-      this.form.setData(data)
+      console.log(data.targetTable)
+      this.form.setData(data.targetTable)
     }, 0)
   }
   // 传入表单回调
   handleOk = (data) => {
-    this.setState({ visible: false })
-    this.setState({ loading: true })
+    this.setState({ visible: false, loading: true })
+    data.status = data.status ? 1 : 0
     window._http.post('metadata/targetTable/update', data).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
@@ -128,16 +148,6 @@ class MetadataTableList extends PureComponent {
     }
     return tagMap[status]
   }
-  renderContent = (content) => {
-    const tagMap = {
-      0: '无变化',
-      1: '表存在变化',
-      2: '表属性存在变化',
-      3: '字段有删减',
-      4: '字段属性有变化'
-    }
-    return tagMap[content]
-  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -158,51 +168,21 @@ class MetadataTableList extends PureComponent {
             />
             <ColumnGroup title='目标版本' >
               <Column
-                title='注释'
+                title='目标版本注释'
                 dataIndex='targetComment'
                 key='targetComment'
-              />
-              <Column
-                title='状态'
-                dataIndex='targetStatus'
-                key='targetStatus'
-                render={(text, record) => (
-                  <>
-                    <Tag color={this.renderColor(text)}>{record.targetStatus ? '存在' : '不存在'}</Tag>
-                  </>
-                )}
               />
             </ColumnGroup>
             <ColumnGroup title='当前快照与目标版本对比' >
               <Column
-                title='注释'
+                title='对比注释'
                 dataIndex='currentComment'
                 key='currentComment'
               />
               <Column
                 title='状态'
-                dataIndex='currentStatus'
-                key='currentStatus'
-                render={(text, record) => (
-                  <>
-                    <Tag color={this.renderColor(text)}>{record.currentStatus ? '存在' : '不存在'}</Tag>
-                  </>
-                )}
-              />
-              <Column
-                title='版本变化'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
-                render={(text, record) => (
-                  <>
-                    <Tag color={this.renderColor(text)}>{this.renderContent(record.currentToTarget)}</Tag>
-                  </>
-                )}
-              />
-              <Column
-                title='版本内容变化'
-                dataIndex='currentToTargetTxt'
-                key='currentToTargetTxt'
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
@@ -212,37 +192,17 @@ class MetadataTableList extends PureComponent {
             </ColumnGroup>
             <ColumnGroup title='上一次快照与当前快照对比'>
               <Column
-                title='注释'
+                title='对比注释'
                 dataIndex='compareComment'
                 key='compareComment'
               />
               <Column
                 title='状态'
-                dataIndex='compareStatus'
-                key='compareStatus'
-                render={(text, record) => (
-                  <>
-                    <Tag color={this.renderColor(text)}>{record.compareStatus ? '存在' : '不存在'}</Tag>
-                  </>
-                )}
-              />
-              <Column
-                title='版本变化'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
                 render={(text, record) => (
                   <>
-                    <Tag color={this.renderColor(4)}>{this.renderContent(record.compareToCurrent)}</Tag>
-                  </>
-                )}
-              />
-              <Column
-                title='版本内容变化'
-                dataIndex='compareToCurrentTxt'
-                key='compareToCurrentTxt'
-                render={(text, record) => (
-                  <>
-                    <Tag color={this.renderColor(3)}>{record.compareToCurrentTxt}</Tag>
+                    <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
                   </>
                 )}
               />
@@ -286,17 +246,16 @@ class AddMetadata extends Component {
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
-      console.log(values)
-      console.log(!err)
       if (!err) {
         this.props.handleBack(values)
-        // this.props.form.resetFields()
+        this.props.form.resetFields()
       }
     })
   }
   setData (data) {
-    const { targetTableId, targetComment } = data
-    this.props.form.setFieldsValue({ targetTableId, targetComment })
+    data.status = !!data.status
+    const { targetTableId, targetComment, status } = data
+    this.props.form.setFieldsValue({ targetTableId, targetComment, status })
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -307,7 +266,7 @@ class AddMetadata extends Component {
           {...formItemSettings}
         >
           {getFieldDecorator('targetTableId')(
-            <Input readOnly />
+            <Input disabled />
           )}
         </Form.Item>
         <Form.Item
@@ -319,6 +278,14 @@ class AddMetadata extends Component {
           })(
             // <Input />
             <textarea style={{ width: '100%' }} />
+          )}
+        </Form.Item>
+        <Form.Item
+          {...formItemSettings}
+          label='启用状态'
+        >
+          {getFieldDecorator('status', { valuePropName: 'checked', initialValue: true })(
+            <Switch />
           )}
         </Form.Item>
         <Form.Item
