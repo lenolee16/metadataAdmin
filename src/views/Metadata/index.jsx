@@ -12,8 +12,8 @@ class Metadata extends PureComponent {
     this.state = {
       data: [],
       visible: false,
-      amendVisible: false,
-      loading: false
+      loading: false,
+      isAdd: true
     }
   }
   componentDidMount () {
@@ -24,7 +24,7 @@ class Metadata extends PureComponent {
       description: 'description',
       dbType: 'mysql',
       jdbcUrl: 'jdbcUrl',
-      status: false,
+      status: 1,
       user: 'user',
       password: 'password'
     }, {
@@ -34,7 +34,7 @@ class Metadata extends PureComponent {
       description: '描述',
       dbType: 'mysql',
       jdbcUrl: '链接',
-      status: false,
+      status: 1,
       user: '用户名',
       password: '密码'
     }, {
@@ -44,7 +44,7 @@ class Metadata extends PureComponent {
       description: '描述',
       dbType: 'mysql',
       jdbcUrl: '链接',
-      status: false,
+      status: 0,
       user: '用户名',
       password: '密码'
     }]
@@ -75,50 +75,42 @@ class Metadata extends PureComponent {
     })
   }
   handleCancel = () => {
-    this.setState({
-      visible: false,
-      amendVisible: false
-    })
+    this.setState({ visible: false })
+    this.form.props.form.resetFields()
   }
-  // 新增的回调函数
-  handleOk = (data) => {
+  handleOk = (values) => {
     this.setState({
-      visible: false,
-      loading: true
+      visible: false
     })
-    data.status = data.status ? 1 : 0
-    window._http.post('/metadata/dataSource/add', data).then(res => {
-      this.setState({ loading: false })
-      if (res.data.code === 0) {
-        window._message.success('新增成功！')
-        this.initData()
-      } else {
-        window._message.error(res.data.msg || '修改失败！')
-      }
-    }).catch(res => {
-      this.setState({ loading: false })
-    })
+    if (values.dataSourceId !== 'undifined') {
+      values.status = values.status ? 1 : 0
+      window._http.post('/metadata/dataSource/update', values).then(res => {
+        if (res.data.code === 0) {
+          this.initData()
+          window._message.success('修改成功！')
+        } else {
+          window._message.error(res.data.msg || '修改失败！')
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    } else {
+      values.status = values.status ? 1 : 0
+      window._http.post('/metadata/dataSource/add', values).then(res => {
+        if (res.data.code === 0) {
+          this.initData()
+          window._message.success('新增成功！')
+        } else {
+          window._message.error(res.data.msg || '修改失败！')
+        }
+      }).catch((err) => {
+        console.log(err)
+      })
+    }
   }
-  // 修改的回调函数
-  handleAmend = (data) => {
-    this.setState({
-      amendVisible: false
-    })
-    data.status = data.status ? 1 : 0
-    window._http.post('/metadata/dataSource/update', data).then(res => {
-      this.setState({ loading: false })
-      if (res.data.code === 0) {
-        window._message.success('修改成功！')
-        this.initData()
-      } else {
-        window._message.error(res.data.msg || '修改失败！')
-      }
-    }).catch(res => {
-      this.setState({ loading: false })
-    })
-  }
+  // 点击修改按钮
   amend = (data) => {
-    this.setState({ amendVisible: true })
+    this.setState({ visible: true, isAdd: false })
     setTimeout(() => {
       this.form.setData(data)
     }, 0)
@@ -142,7 +134,7 @@ class Metadata extends PureComponent {
       <div className='User'>
         <Card title='源数据库管理'>
           <div className='clearfix' style={{ marginBottom: 12 }}>
-            <Button type='primary' onClick={() => this.setState({ visible: true })}>
+            <Button type='primary' onClick={() => this.setState({ visible: true, isAdd: true })}>
               新增
             </Button>
             <Search
@@ -201,29 +193,20 @@ class Metadata extends PureComponent {
               render={(text, record) => (
                 <>
                   <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
-                  <Button type='primary' ghost icon='file-sync' style={{ color: 'green', borderColor: 'green' }} onClick={() => this.testFnc(record)}>测试</Button>
+                  <Button type='primary' ghost icon='file-sync' style={{ color: '#4eca6a', borderColor: '#4eca6a' }} onClick={() => this.testFnc(record)}>测试</Button>
                 </>
               )}
             />
           </Table>
         </Card>
         <Modal
-          title='新增'
+          title={this.state.isAdd ? '新增' : '修改'}
           width='600px'
           visible={this.state.visible}
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm handleBack={this.handleOk} />
-        </Modal>
-        <Modal
-          title='修改'
-          width='600px'
-          visible={this.state.amendVisible}
-          onCancel={this.handleCancel}
-          footer={null}
-        >
-          <WrappedForm wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleAmend} />
+          <WrappedForm wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleOk} />
         </Modal>
       </div>
     )
@@ -239,17 +222,15 @@ class AddMetadata extends PureComponent {
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
-      console.log(values)
-      console.log(!err)
       if (!err) {
         this.props.handleBack(values)
-        // this.props.form.resetFields()
+        this.props.form.resetFields()
       }
     })
   }
   setData (data) {
-    // const { dataSourceId, ..._data } = data
-    // console.log(_data)
+    console.log(data)
+    data.status = !!data.status
     this.props.form.setFieldsValue(data)
   }
   render () {
@@ -261,7 +242,7 @@ class AddMetadata extends PureComponent {
           {...formItemSettings}
         >
           {getFieldDecorator('dataSourceId')(
-            <Input readOnly />
+            <Input disabled />
           )}
         </Form.Item>
         <Form.Item
