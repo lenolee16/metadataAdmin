@@ -16,7 +16,7 @@ class MetadataColumnList extends PureComponent {
         pageSize: 10,
         current: 1
       },
-      formData: null,
+      formDataId: null,
       loading: false
     }
   }
@@ -57,13 +57,16 @@ class MetadataColumnList extends PureComponent {
     this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   handleCancel = () => {
-    this.setState({ visible: false, formData: null })
+    this.setState({ visible: false, formDataId: null })
   }
   handleOk = () => {
-    this.setState({ visible: false, formData: null })
+    const pager = this.state.pagination
+    pager.current = 1
+    this.setState({ visible: false, formDataId: null, pagination: pager })
+    this.queryData()
   }
   edit = (data) => {
-    this.setState({ visible: true, formData: data })
+    this.setState({ visible: true, formDataId: data.targetFieldId })
     setTimeout(() => {
       this.form.setForm(data)
     }, 0)
@@ -135,13 +138,13 @@ class MetadataColumnList extends PureComponent {
           </Table>
         </Card>
         <Modal
-          title='新增'
+          title={this.state.formDataId === null ? '新增' : '修改'}
           width='600px'
           visible={this.state.visible}
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm handleBack={this.handleOk} wrappedComponentRef={(form) => { this.form = form }} formData={this.state.formData} />
+          <WrappedForm handleBack={this.handleOk} wrappedComponentRef={(form) => { this.form = form }} formDataId={this.state.formDataId} />
         </Modal>
       </div>
     )
@@ -162,8 +165,8 @@ class AddMetadata extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
-        if (this.props.formData) {
-          window._http.post(`/metadata/targetField/update`, { targetFieldId: this.props.formData.targetFieldId, ...values }).then(res => {
+        if (this.props.formDataId !== null) {
+          window._http.post(`/metadata/targetField/update`, { targetFieldId: this.props.formDataId, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -269,7 +272,7 @@ class AddMetadata extends Component {
 AddMetadata.propTypes = {
   form: PropTypes.object,
   handleBack: PropTypes.func,
-  formData: PropTypes.any
+  formDataId: PropTypes.any
 }
 
 const WrappedForm = Form.create()(AddMetadata)
