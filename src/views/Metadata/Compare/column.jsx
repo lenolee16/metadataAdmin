@@ -24,7 +24,7 @@ class MetadataColumnList extends PureComponent {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.data.filter(item => item.fieldName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    this.setState({ data: this.data.filter(item => item.targetFieldName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   componentDidMount () {
     this.queryData()
