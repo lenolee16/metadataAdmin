@@ -135,6 +135,7 @@ render () {
             title='密码'
             dataIndex='password'
             key='password'
+            render={() => '*****'}
           />
           <Column
             title='状态'

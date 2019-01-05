@@ -26,11 +26,11 @@ class MetadataTableList extends PureComponent {
       targetStatus: '1',
       currentComment: 'currentComment',
       currentStatus: '1',
-      currentToTarget: 'currentToTarget',
+      currentToTarget: '0',
       currentToTargetTxt: 'currentToTargetTxt',
       compareComment: 'compareComment',
       compareStatus: '1',
-      compareToCurrent: 'compareToCurrent',
+      compareToCurrent: '2',
       compareToCurrentTxt: 'compareToCurrentTxt'
     }, {
       targetTableId: '2',
@@ -39,11 +39,11 @@ class MetadataTableList extends PureComponent {
       targetStatus: '1',
       currentComment: '当前注释',
       currentStatus: '1',
-      currentToTarget: '当前版本',
+      currentToTarget: '0',
       currentToTargetTxt: '当前版本内容',
       compareComment: '上一次注释',
       compareStatus: '1',
-      compareToCurrent: '上一次版本',
+      compareToCurrent: '2',
       compareToCurrentTxt: '上一次版本内容'
     }]
     this.setState({ data: this.data })
@@ -119,13 +119,24 @@ class MetadataTableList extends PureComponent {
   }
   // 判断颜色 0无变化 1表存在变化 2表属性是否变化 3表字段有无删减 4表字段属性有无变化
   renderColor = (status) => {
-    console.log(status)
     const tagMap = {
       0: '',
+      1: '',
+      2: '',
       3: 'green',
       4: 'red'
     }
     return tagMap[status]
+  }
+  renderContent = (content) => {
+    const tagMap = {
+      0: '无变化',
+      1: '表存在变化',
+      2: '表属性存在变化',
+      3: '字段有删减',
+      4: '字段属性有变化'
+    }
+    return tagMap[content]
   }
   render () {
     return (
@@ -184,7 +195,7 @@ class MetadataTableList extends PureComponent {
                 key='currentToTarget'
                 render={(text, record) => (
                   <>
-                    <Tag color={this.renderColor(text)}>{record.currentToTarget}</Tag>
+                    <Tag color={this.renderColor(text)}>{this.renderContent(record.currentToTarget)}</Tag>
                   </>
                 )}
               />
@@ -221,7 +232,7 @@ class MetadataTableList extends PureComponent {
                 key='compareToCurrent'
                 render={(text, record) => (
                   <>
-                    <Tag color={this.renderColor(text)}>{record.compareToCurrent}</Tag>
+                    <Tag color={this.renderColor(4)}>{this.renderContent(record.compareToCurrent)}</Tag>
                   </>
                 )}
               />
@@ -231,7 +242,7 @@ class MetadataTableList extends PureComponent {
                 key='compareToCurrentTxt'
                 render={(text, record) => (
                   <>
-                    <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
+                    <Tag color={this.renderColor(3)}>{record.compareToCurrentTxt}</Tag>
                   </>
                 )}
               />
@@ -242,9 +253,9 @@ class MetadataTableList extends PureComponent {
               width='200'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginBottom: '5px' }} >查看</Button></Link>
-                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginBottom: '5px' }}>修改</Button>
-                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' size='small' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
+                    <Button type='primary' size='small' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
+                    <Button type='danger' size='small' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
             />
@@ -279,12 +290,13 @@ class AddMetadata extends Component {
       console.log(!err)
       if (!err) {
         this.props.handleBack(values)
-        this.props.form.resetFields()
+        // this.props.form.resetFields()
       }
     })
   }
   setData (data) {
-    this.props.form.setFieldsValue(data)
+    const { targetTableId, targetComment } = data
+    this.props.form.setFieldsValue({ targetTableId, targetComment })
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -299,73 +311,14 @@ class AddMetadata extends Component {
           )}
         </Form.Item>
         <Form.Item
-          label='数据表名称'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('tableName', {
-            rules: [{ required: true, message: '请输入数据表名称' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='目标注释'
+          label='目标版本注释'
           {...formItemSettings}
         >
           {getFieldDecorator('targetComment', {
-            rules: [{ required: true, message: '请输入目标注释' }]
+            rules: [{ required: true, message: '请输入目标版本注释' }]
           })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='目标状态'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('targetStatus', {
-            rules: [{ required: false, message: '请输入目标状态' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='当前注释'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('currentComment', {
-            rules: [{ required: false, message: '请输入当前注释' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='当前状态'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('currentStatus', {
-            rules: [{ required: true, message: '请输入当前状态' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='对比注释'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('compareComment', {
-            rules: [{ required: true, message: '请输入对比注释' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='对比状态'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('compareStatus', {
-            rules: [{ required: true, message: '请输入对比状态' }]
-          })(
-            <Input />
+            // <Input />
+            <textarea style={{ width: '100%' }} />
           )}
         </Form.Item>
         <Form.Item
