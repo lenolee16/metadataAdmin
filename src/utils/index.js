@@ -11,4 +11,7 @@ utils.loading = {
   }
 }
 
+utils.getLoggedIn = () => sessionStorage.getItem('isLoggedIn') === '1'
+utils.setLoggedIn = (Boolean) => sessionStorage.setItem('isLoggedIn', Boolean ? '1' : '0')
+
 export default utils

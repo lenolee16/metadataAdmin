@@ -1,5 +1,6 @@
 import React, { Suspense } from 'react'
 import { Switch, Route } from 'react-router-dom'
+import Login from 'views/Login'
 import MainView from 'views/MainView'
 import Home from 'views/Home'
 import UserManage from 'views/User'
@@ -8,6 +9,7 @@ import MetadataSearch from 'views/Metadata/Search'
 import MetadataList from 'views/Metadata/Compare'
 import MetadataTableList from 'views/Metadata/Compare/table'
 import MetadataColumnList from 'views/Metadata/Compare/column'
+import authHOC from 'utils/auth'
 
 // https://reactjs.org/docs/code-splitting.html#suspense
 const AsyncView = React.lazy(() => import(/* webpackChunkName: "async" */ 'views/AsyncView'))
@@ -57,7 +59,8 @@ const routes = [
 
 const RenderRouters = (
   <Switch>
-    <Route path='/' component={MainView} />
+    <Route path='/login' component={Login} />
+    <Route path='/' component={authHOC(MainView)} />
   </Switch>
 )
 
