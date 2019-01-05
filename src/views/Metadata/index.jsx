@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Table, Button, Input, Modal, Form, Select, Switch } from 'antd'
+import utils from 'utils'
 const { Column } = Table
 const { Search } = Input
 
@@ -12,9 +13,7 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       amendVisible: false,
-      isEdit: false,
-      loading: false,
-      formData: null
+      loading: false
     }
   }
   componentDidMount () {
@@ -81,58 +80,61 @@ class Metadata extends PureComponent {
       amendVisible: false
     })
   }
-  // 添加
+  // 新增的回调函数
   handleOk = (data) => {
     this.setState({
       visible: false,
       loading: true
     })
-    // data.dataSourceId = this.data.length + 1
-    // const newData = this.data
-    // newData.push(data)
-    // this.setState({ data: newData })
-    // http://10.31.21.22:8080/metadata_manager_api
     data.status = data.status ? 1 : 0
-    window._http.post('/metadata/dataSource/add', {
-      ...data,
-      'extra': {}
-    }).then(res => {
+    window._http.post('/metadata/dataSource/add', data).then(res => {
+      this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.setState({ loading: false })
+        window._message.success('新增成功！')
         this.initData()
       } else {
-        this.setState({ loading: false })
+        window._message.error(res.data.msg || '修改失败！')
       }
     }).catch(res => {
       this.setState({ loading: false })
     })
   }
-  // 修改
+  // 修改的回调函数
   handleAmend = (data) => {
     this.setState({
       amendVisible: false
     })
+    data.status = data.status ? 1 : 0
+    window._http.post('/metadata/dataSource/update', data).then(res => {
+      this.setState({ loading: false })
+      if (res.data.code === 0) {
+        window._message.success('修改成功！')
+        this.initData()
+      } else {
+        window._message.error(res.data.msg || '修改失败！')
+      }
+    }).catch(res => {
+      this.setState({ loading: false })
+    })
   }
-  amend = (record) => {
-    console.log(record)
-    // this.props.form.setFieldsValue({
-    //   note: `Hi, ${value === 'male' ? 'man' : 'lady'}!`
-    // })
-
-    this.setState({ amendVisible: true, formData: record })
+  amend = (data) => {
+    this.setState({ amendVisible: true })
+    setTimeout(() => {
+      this.form.setData(data)
+    }, 0)
   }
   // 测试数据源
   testFnc = (data) => {
-    console.log(data)
+    utils.loading.show()
     window._http.post('/metadata/dataSource/test', { dataSourceId: data.dataSourceId }).then(res => {
+      utils.loading.hide()
       if (res.data.code === 0) {
         window._notification.success('请求成功')
       } else {
         window._notification.error('请求失败')
       }
-    }).catch(err => {
-      console.log(err)
-      window._message.error(err)
+    }).catch(() => {
+      utils.loading.hide()
     })
   }
   render () {
@@ -219,7 +221,7 @@ class Metadata extends PureComponent {
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm formData={this.state.formData} handleBack={this.handleAmend} isEdit={this.isEdit} />
+          <WrappedForm wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleAmend} />
         </Modal>
       </div>
     )
@@ -243,22 +245,23 @@ class AddMetadata extends PureComponent {
       }
     })
   }
-  componentDidMount () {
-    if (this.props.formData) {
-      setTimeout(() => {
-        this.setData(this.props.formData)
-      }, 0)
-    }
-  }
   setData (data) {
-    const { dataSourceId, ..._data } = data
-    console.log(_data)
-    this.props.form.setFieldsValue(_data)
+    // const { dataSourceId, ..._data } = data
+    // console.log(_data)
+    this.props.form.setFieldsValue(data)
   }
   render () {
     const { getFieldDecorator } = this.props.form
     return (
       <Form onSubmit={this.handleSubmit}>
+        <Form.Item
+          label='数据源Id'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('dataSourceId')(
+            <Input readOnly />
+          )}
+        </Form.Item>
         <Form.Item
           label='标题'
           {...formItemSettings}
@@ -357,9 +360,7 @@ class AddMetadata extends PureComponent {
 
 AddMetadata.propTypes = {
   form: PropTypes.object,
-  handleBack: PropTypes.func,
-  isEdit: PropTypes.bool,
-  formData: PropTypes.any
+  handleBack: PropTypes.func
 }
 
 const WrappedForm = Form.create()(AddMetadata)

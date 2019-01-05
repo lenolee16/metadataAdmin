@@ -1,6 +1,8 @@
-import React, { PureComponent } from 'react'
-import { Card, Table, Button, Input } from 'antd'
+import React, { PureComponent, Component } from 'react'
+import PropTypes from 'prop-types'
+import { Card, Table, Button, Input, Form, Modal } from 'antd'
 import { Link } from 'react-router-dom'
+import utils from 'utils'
 const { Column } = Table
 const { Search } = Input
 
@@ -11,8 +13,8 @@ class MetadataTableList extends PureComponent {
       data: [],
       visible: false,
       dataSourceId: '1',
-      loading: false,
-      formData: null
+      loading: false
+      // formData: null
     }
   }
   componentDidMount () {
@@ -27,17 +29,16 @@ class MetadataTableList extends PureComponent {
       compareStatus: '对比状态'
     }, {
       targetTableId: '2',
-      tableName: 'ssssss',
-      targetComment: '目标注释',
-      targetStatus: '目标状态',
-      currentComment: '当前注释',
-      currentStatus: '当前状态',
-      compareComment: '对比注释',
-      compareStatus: '对比状态'
+      tableName: 'tableName',
+      targetComment: 'targetComment',
+      targetStatus: 'targetStatus',
+      currentComment: 'currentComment',
+      currentStatus: 'currentStatus',
+      compareComment: 'compareComment',
+      compareStatus: 'compareStatus'
     }]
     this.setState({ data: this.data })
-  // this.initData()
-  // this.wrappedForm.current.focusTextInput()
+    this.initData()
   }
   filter = (val) => {
     if (!val) {
@@ -47,8 +48,9 @@ class MetadataTableList extends PureComponent {
   }
   // 初始化table
   initData = () => {
+    const { params: { databaseId } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/list').then(res => {
+    window._http.post('/metadata/dataSource/list', { dataSourceId: databaseId }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -61,22 +63,50 @@ class MetadataTableList extends PureComponent {
       this.setState({ loading: false })
     })
   }
-  // 同步 /metadata/dataSource/sync
+  // 同步数据表
   sync = (data) => {
-    window._http.post('/metadata/dataSource/syne', { dataSourceId: data.dataSourceId }).then(res => {
+    utils.loading.show()
+    window._http.post('/metadata/sourceTable/sync', { dataSourceId: data.targetTableId }).then(res => {
+      utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功')
       } else {
         window._message.error('同步失败')
       }
-    }).catch(err => {
-      console.log(err)
-      window._message.error(err)
+    }).catch(() => {
+      utils.loading.hide()
     })
   }
   // 修改
-  amend = () => {
+  amend = (data) => {
     console.log('我在修改')
+    this.setState({
+      visible: true
+    })
+    setTimeout(() => {
+      this.form.setData(data)
+    }, 0)
+  }
+  // 传入表单回调
+  handleOk = (data) => {
+    this.setState({ visible: false })
+    this.setState({ loading: true })
+    window._http.post('metadata/targetTable/update', data).then(res => {
+      this.setState({ loading: false })
+      if (res.data.code === 0) {
+        window._message.success('修改成功！')
+        this.initData()
+      } else {
+        window._message.error(res.data.msg || '修改失败')
+      }
+    }).catch(res => {
+      this.setState({ loading: false })
+    })
+  }
+  handleCancel = () => {
+    this.setState({
+      visible: false
+    })
   }
   render () {
     return (
@@ -139,9 +169,140 @@ class MetadataTableList extends PureComponent {
             />
           </Table>
         </Card>
+        <Modal
+          title='修改'
+          width='600px'
+          visible={this.state.visible}
+          onCancel={this.handleCancel}
+          footer={null}
+        >
+          <WrappedForm wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleOk} />
+        </Modal>
       </div>
     )
   }
 }
+MetadataTableList.propTypes = {
+  match: PropTypes.object
+}
+const formItemSettings = {
+  labelCol: { span: 5 },
+  wrapperCol: { span: 12 }
+}
 
+class AddMetadata extends Component {
+  handleSubmit = (e) => {
+    e.preventDefault()
+    this.props.form.validateFields((err, values) => {
+      console.log(values)
+      console.log(!err)
+      if (!err) {
+        this.props.handleBack(values)
+        this.props.form.resetFields()
+      }
+    })
+  }
+  setData (data) {
+    this.props.form.setFieldsValue(data)
+  }
+  render () {
+    const { getFieldDecorator } = this.props.form
+    return (
+      <Form onSubmit={this.handleSubmit}>
+        <Form.Item
+          label='数据表Id'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetTableId')(
+            <Input readOnly />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='数据表名称'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('tableName', {
+            rules: [{ required: true, message: '请输入数据表名称' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='目标注释'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetComment', {
+            rules: [{ required: true, message: '请输入目标注释' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='目标状态'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetStatus', {
+            rules: [{ required: false, message: '请输入目标状态' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='当前注释'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('currentComment', {
+            rules: [{ required: false, message: '请输入当前注释' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='当前状态'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('currentStatus', {
+            rules: [{ required: true, message: '请输入当前状态' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='对比注释'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('compareComment', {
+            rules: [{ required: true, message: '请输入对比注释' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='对比状态'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('compareStatus', {
+            rules: [{ required: true, message: '请输入对比状态' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          wrapperCol={{ span: 12, offset: 5 }}
+        >
+          <Button type='primary' htmlType='submit'>
+            提交
+          </Button>
+        </Form.Item>
+      </Form>
+    )
+  }
+}
+
+AddMetadata.propTypes = {
+  form: PropTypes.object,
+  handleBack: PropTypes.func
+}
+
+const WrappedForm = Form.create()(AddMetadata)
 export default MetadataTableList
