@@ -15,6 +15,17 @@ class Login extends PureComponent {
       password: ''
     }
   }
+  componentDidMount () {
+    document.addEventListener('keypress', this.handleEnterKey)
+  }
+  componentWillUmount () {
+    document.removeEventListener('keypress', this.handleEenterKey)
+  }
+  handleEnterKey = (e) => {
+    if (e.keyCode === 13) {
+      this.login()
+    }
+  }
   login = () => {
     if (!this.state.user) {
       return window._message.error('请输入用户名！')
