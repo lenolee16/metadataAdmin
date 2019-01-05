@@ -1,10 +1,10 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Button, Input, Form, Switch, Modal, Table } from 'antd'
+import { Card, Button, Input, Form, Switch, Modal, Table, Tag } from 'antd'
 import utils from 'utils'
 
 const { Search } = Input
-const { Column } = Table
+const { Column, ColumnGroup } = Table
 
 class MetadataColumnList extends PureComponent {
   constructor (props) {
@@ -58,6 +58,7 @@ class MetadataColumnList extends PureComponent {
   }
   handleCancel = () => {
     this.setState({ visible: false, formDataId: null })
+    this.form.props.form.resetFields()
   }
   handleOk = () => {
     const pager = this.state.pagination
@@ -73,7 +74,7 @@ class MetadataColumnList extends PureComponent {
   }
   sync = (data) => {
     utils.loading.show()
-    window._http.post('/metadata/targetField/compareField', { targetFieldId: data.targetFieldId }).then(res => {
+    window._http.post('/metadata/sourceField/sync', { targetFieldId: data.targetFieldId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
@@ -83,6 +84,14 @@ class MetadataColumnList extends PureComponent {
     }).catch(res => {
       utils.loading.hide()
     })
+  }
+  renderColor = (status) => {
+    const tagMap = {
+      0: '',
+      3: 'green',
+      4: 'red'
+    }
+    return tagMap[status]
   }
   render () {
     return (
@@ -99,32 +108,53 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='fieldName' pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
+          <Table rowKey='fieldName' bordered pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
             <Column
               title='字段名称'
               dataIndex='fieldName'
               key='fieldName'
             />
-            <Column
-              title='目标类型'
-              dataIndex='targetType'
-              key='targetType'
-            />
-            <Column
-              title='目标注释'
-              dataIndex='targetComment'
-              key='targetComment'
-            />
-            <Column
-              title='当前类型'
-              dataIndex='currentType'
-              key='currentType'
-            />
-            <Column
-              title='当前注释'
-              dataIndex='currentComment'
-              key='currentComment'
-            />
+            <ColumnGroup title='目标'>
+              <Column
+                title='目标注释'
+                dataIndex='targetComment'
+                key='targetComment'
+              />
+            </ColumnGroup>
+            <ColumnGroup title='当前快照'>
+              <Column
+                title='当前注释'
+                dataIndex='currentComment'
+                key='currentComment'
+              />
+              <Column
+                title='当前状态'
+                dataIndex='currentToTarget'
+                key='currentToTarget'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
+                  </>
+                )}
+              />
+            </ColumnGroup>
+            <ColumnGroup title='上一次快照'>
+              <Column
+                title='上一次注释'
+                dataIndex='compareComment'
+                key='compareComment'
+              />
+              <Column
+                title='上一次状态'
+                dataIndex='compareToCurrent'
+                key='compareToCurrent'
+                render={(text, record) => (
+                  <>
+                    <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
+                  </>
+                )}
+              />
+            </ColumnGroup>
             <Column
               title='操作'
               key='action'
@@ -206,7 +236,7 @@ class AddMetadata extends Component {
           {getFieldDecorator('targetFieldName', {
             rules: [{ required: true, message: '请输入字段名' }]
           })(
-            <Input />
+            <Input disabled={this.props.formDataId !== null} />
           )}
         </Form.Item>
         <Form.Item
