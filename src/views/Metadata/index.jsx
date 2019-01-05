@@ -2,9 +2,9 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Table, Button, Input, Modal, Form, Select, Switch } from 'antd'
 import utils from 'utils'
+
 const { Column } = Table
 const { Search } = Input
-
 class Metadata extends PureComponent {
   constructor (props) {
     super(props)
@@ -19,14 +19,14 @@ class Metadata extends PureComponent {
   componentDidMount () {
     this.data = [{
       dataSourceId: '1',
-      title: '所属',
-      dbName: 'John Brown',
-      description: '描述',
+      title: 'title',
+      dbName: 'dbName',
+      description: 'description',
       dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
+      jdbcUrl: 'jdbcUrl',
+      status: false,
+      user: 'user',
+      password: 'password'
     }, {
       dataSourceId: '2',
       title: '所属',
@@ -34,7 +34,7 @@ class Metadata extends PureComponent {
       description: '描述',
       dbType: 'mysql',
       jdbcUrl: '链接',
-      status: '0',
+      status: false,
       user: '用户名',
       password: '密码'
     }, {
@@ -44,7 +44,7 @@ class Metadata extends PureComponent {
       description: '描述',
       dbType: 'mysql',
       jdbcUrl: '链接',
-      status: '0',
+      status: false,
       user: '用户名',
       password: '密码'
     }]
@@ -187,11 +187,13 @@ class Metadata extends PureComponent {
               title='密码'
               dataIndex='password'
               key='password'
+              render={() => '*****'}
             />
             <Column
               title='状态'
               dataIndex='status'
               key='state'
+              render={(v) => v.status ? 1 : 0}
             />
             <Column
               title='操作'
