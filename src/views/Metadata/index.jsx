@@ -13,6 +13,10 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
+      // pagination: {
+      //   pageSize: 10,
+      //   current: 1
+      // },
       isAdd: true
     }
   }
@@ -47,6 +51,106 @@ class Metadata extends PureComponent {
       status: 0,
       user: '用户名',
       password: '密码'
+    }, {
+      dataSourceId: '4',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '5',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '6',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '7',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '8',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '9',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '10',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '11',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '12',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
+    }, {
+      dataSourceId: '13',
+      title: '所属',
+      dbName: 'Joe Black',
+      description: '描述',
+      dbType: 'mysql',
+      jdbcUrl: '链接',
+      status: 0,
+      user: '用户名',
+      password: '密码'
     }]
     this.setState({ data: this.data })
     // this.initData()
@@ -67,6 +171,10 @@ class Metadata extends PureComponent {
           data: res.data.data,
           loading: false
         })
+        // const pager = this.state.pagination
+        // pager.total = this.data.length
+        // this.setState({ pagination: pager })
+        // this.partPage(1)
       } else {
         this.setState({ loading: false })
       }
@@ -74,6 +182,18 @@ class Metadata extends PureComponent {
       this.setState({ loading: false })
     })
   }
+  // partPage = (current) => {
+  //   this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
+  // }
+  // handleTableChange = (pagination, filters, sorter) => {
+  //   console.log(pagination, filters, sorter)
+  //   const pager = { ...this.state.pagination }
+  //   pager.current = pagination.current
+  //   this.setState({
+  //     pagination: pager
+  //   })
+  //   this.partPage(pager.current)
+  // }
   handleCancel = () => {
     this.setState({ visible: false })
     this.form.props.form.resetFields()

@@ -13,12 +13,14 @@ class MetadataTableList extends PureComponent {
       data: [],
       visible: false,
       // 数据源id
-      dataSourceId: '1',
+      dataSourceId: null,
       loading: false
       // formData: null
     }
   }
   componentDidMount () {
+    // 拿到上个页面传递过来的源id
+    this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.data = [{
       targetTableId: '1',
       tableName: 'tablesName',
@@ -255,7 +257,7 @@ class MetadataTableList extends PureComponent {
               width='200'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${this.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
+                    <Link to={`/metadataList/${this.state.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
                     <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
                     <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
