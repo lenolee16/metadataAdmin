@@ -88,9 +88,10 @@ class MetadataTableList extends PureComponent {
     window._http.post('/metadata/targetTable/compareTable', { sourceDatabaseId: databaseId }).then(res => {
       if (res.data.code === 0) {
         this.setState({
-          data: res.data.data,
+          data: res.data.data.dataList,
           loading: false
         })
+        console.log(res.data.data.dataList)
       } else {
         this.setState({ loading: false })
       }
