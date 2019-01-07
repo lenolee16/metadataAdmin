@@ -1,7 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
-import { Link } from 'react-router-dom'
+// import { Link } from 'react-router-dom'
 import utils from 'utils'
 const { Column, ColumnGroup } = Table
 const { Search } = Input
@@ -73,7 +73,7 @@ class MetadataTableList extends PureComponent {
       }
     }]
     this.setState({ data: this.data })
-    this.initData()
+    // this.initData()
   }
   filter = (val) => {
     if (!val) {
@@ -111,6 +111,14 @@ class MetadataTableList extends PureComponent {
     }).catch(() => {
       utils.loading.hide()
     })
+  }
+  // 查看
+  examine = (data) => {
+    if (data.targerTable && data.targetTable.targetTableId !== null) {
+      this.props.history.push(`/metadataList/${this.state.dataSourceId}/${data.targetTableId}`)
+    } else {
+      window._message.error('目标表id不存在，无法查看！')
+    }
   }
   // 修改
   amend = (data) => {
@@ -158,7 +166,6 @@ class MetadataTableList extends PureComponent {
   }
   // 目标版本号
   renderPopover = (data) => {
-    console.log(data)
     return (
       <div className='Popover'>
         <p>表注释：{data.targetComment}</p>
@@ -257,7 +264,8 @@ class MetadataTableList extends PureComponent {
               width='200'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${this.state.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} >查看</Button></Link>
+                    {/* <Link to={`/metadataList/${this.state.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={()=>this.} >查看</Button></Link> */}
+                    <Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
                     <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
                     <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
@@ -279,7 +287,8 @@ class MetadataTableList extends PureComponent {
   }
 }
 MetadataTableList.propTypes = {
-  match: PropTypes.object
+  match: PropTypes.object,
+  history: PropTypes.func
 }
 const formItemSettings = {
   labelCol: { span: 5 },
