@@ -203,7 +203,7 @@ class MetadataColumnList extends PureComponent {
                 key='compareToCurrent'
                 render={(text, record) => (
                   <>
-                    <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
+                    <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
                   </>
                 )}
               />
