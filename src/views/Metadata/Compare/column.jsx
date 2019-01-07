@@ -248,9 +248,10 @@ class AddMetadata extends Component {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
       if (!err) {
+        values.status = values.status ? 1 : 0
         const { params: { databaseId, id } } = this.props.match
         if (this.props.formDataId !== null) {
-          window._http.post(`/metadata/targetField/update`, { sourceDatabaseId: databaseId, targetTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/update`, { dataSourceId: databaseId, sourceTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -260,7 +261,7 @@ class AddMetadata extends Component {
             }
           })
         } else {
-          window._http.post(`/metadata/targetField/add`, { sourceDatabaseId: databaseId, targetTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/add`, { dataSourceId: databaseId, sourceTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -340,9 +341,7 @@ class AddMetadata extends Component {
           label='默认值'
           {...formItemSettings}
         >
-          {getFieldDecorator('targetDefaultValue', {
-            rules: [{ required: true, message: '请输入默认值' }]
-          })(
+          {getFieldDecorator('targetDefaultValue')(
             <Input />
           )}
         </Form.Item>
