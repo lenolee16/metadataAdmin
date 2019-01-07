@@ -32,7 +32,7 @@ class MetadataColumnList extends PureComponent {
   queryData () {
     const { params: { databaseId, id } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/targetField/compareField', { sourceDatabaseId: databaseId, sourceTableId: id }).then(res => {
+    window._http.post('/metadata/targetField/compareField', { sourceDatabaseId: databaseId, targetTableId: id }).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
@@ -40,6 +40,8 @@ class MetadataColumnList extends PureComponent {
         pager.total = this.data.length
         this.setState({ pagination: pager })
         this.partPage(pager.current)
+      } else {
+        window._message.error(res.data.msg || '查询失败')
       }
     }).catch(() => {
       this.setState({ loading: false })
@@ -75,7 +77,7 @@ class MetadataColumnList extends PureComponent {
   sync = (data) => {
     utils.loading.show()
     const { params: { databaseId, id } } = this.props.match
-    window._http.post('/metadata/sourceField/sync', { sourceDatabaseId: databaseId, sourceTableId: id, targetFieldName: data.targetFieldName }).then(res => {
+    window._http.post('/metadata/sourceField/sync', { sourceDatabaseId: databaseId, targetTableId: id, targetFieldName: data.targetFieldName }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
@@ -248,7 +250,7 @@ class AddMetadata extends Component {
       if (!err) {
         const { params: { databaseId, id } } = this.props.match
         if (this.props.formDataId !== null) {
-          window._http.post(`/metadata/targetField/update`, { sourceDatabaseId: databaseId, sourceTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/update`, { sourceDatabaseId: databaseId, targetTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -258,7 +260,7 @@ class AddMetadata extends Component {
             }
           })
         } else {
-          window._http.post(`/metadata/targetField/add`, { sourceDatabaseId: databaseId, sourceTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/add`, { sourceDatabaseId: databaseId, targetTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
