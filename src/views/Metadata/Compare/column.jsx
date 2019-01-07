@@ -83,7 +83,7 @@ class MetadataColumnList extends PureComponent {
         window._message.success('同步成功！')
         this.queryData()
       } else {
-        window._message.success('同步失败！')
+        window._message.error(res.data.msg || '同步失败！')
       }
     }).catch(res => {
       utils.loading.hide()
