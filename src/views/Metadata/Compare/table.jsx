@@ -105,6 +105,7 @@ class MetadataTableList extends PureComponent {
     window._http.post('/metadata/sourceTable/sync', { sourceTableId: data.currentTableId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
+        this.initData()
         window._message.success(res.data.msg)
       } else {
         window._message.error(res.data.msg)
