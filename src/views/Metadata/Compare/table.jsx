@@ -115,7 +115,8 @@ class MetadataTableList extends PureComponent {
   }
   // 查看
   examine = (data) => {
-    if (data.targerTable && data.targetTable.targetTableId !== null) {
+    console.log(data.targetTable)
+    if (data.targetTable && data.targetTable.targetTableId !== null) {
       this.props.history.push(`/metadataList/${this.state.dataSourceId}/${data.targetTableId}`)
     } else {
       window._message.error('目标表id不存在，无法查看！')
