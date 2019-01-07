@@ -21,9 +21,9 @@ class MetadataList extends PureComponent {
   }
 filter = (val) => {
   if (!val) {
-    return this.setState({ data: this.data })
+    return this.setState({ data: this.state.data })
   }
-  this.setState({ data: this.data.filter(item => item.dbName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+  this.setState({ data: this.state.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
 }
 // 初始化table
 initData = () => {
@@ -47,9 +47,9 @@ sync = (data) => {
   window._http.post('/metadata/dataSource/sync', { dataSourceId: data.dataSourceId }).then(res => {
     utils.loading.hide()
     if (res.data.code === 0) {
-      window._message.success('同步成功')
+      window._message.success(res.data.msg)
     } else {
-      window._message.error('同步失败')
+      window._message.error(res.data.msg)
     }
   }).catch(() => {
     utils.loading.hide()
@@ -72,11 +72,6 @@ render () {
             title='标题'
             dataIndex='title'
             key='title'
-          />
-          <Column
-            title='数据库名称'
-            dataIndex='dbName'
-            key='dbName'
           />
           <Column
             title='描述'
