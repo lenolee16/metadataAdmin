@@ -17,7 +17,7 @@ class Metadata extends PureComponent {
       //   pageSize: 10,
       //   current: 1
       // },
-      isAdd: true
+      formDataId: null
     }
   }
   componentDidMount () {
@@ -27,7 +27,7 @@ class Metadata extends PureComponent {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.data.filter(item => item.dbName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    this.setState({ data: this.state.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   // 初始化table
   initData = () => {
@@ -66,10 +66,11 @@ class Metadata extends PureComponent {
     this.form.props.form.resetFields()
   }
   handleOk = (values) => {
+    console.log(values)
     this.setState({
       visible: false
     })
-    if (values.dataSourceId !== 'undifined') {
+    if (values.dataSourceId === 'undifined') {
       values.status = values.status ? 1 : 0
       window._http.post('/metadata/dataSource/update', values).then(res => {
         if (res.data.code === 0) {
@@ -97,7 +98,7 @@ class Metadata extends PureComponent {
   }
   // 点击修改按钮
   amend = (data) => {
-    this.setState({ visible: true, isAdd: false })
+    this.setState({ visible: true, formDataId: data.dataSourceId })
     setTimeout(() => {
       this.form.setData(data)
     }, 0)
@@ -121,12 +122,12 @@ class Metadata extends PureComponent {
       <div className='User'>
         <Card title='源数据库管理'>
           <div className='clearfix' style={{ marginBottom: 12 }}>
-            <Button type='primary' onClick={() => this.setState({ visible: true, isAdd: true })}>
+            <Button type='primary' onClick={() => this.setState({ visible: true, formDataId: null })}>
               新增
             </Button>
             <Search
               className='fr'
-              placeholder='源数据库名称'
+              placeholder='源数据库标题'
               onSearch={this.filter}
               style={{ width: 200 }}
             />
@@ -136,11 +137,6 @@ class Metadata extends PureComponent {
               title='标题'
               dataIndex='title'
               key='title'
-            />
-            <Column
-              title='数据库名称'
-              dataIndex='dbName'
-              key='dbName'
             />
             <Column
               title='描述'
@@ -195,13 +191,13 @@ class Metadata extends PureComponent {
           </Table>
         </Card>
         <Modal
-          title={this.state.isAdd ? '新增' : '修改'}
+          title={this.state.formDataId === null ? '新增' : '修改'}
           width='600px'
           visible={this.state.visible}
           onCancel={this.handleCancel}
           footer={null}
         >
-          <WrappedForm wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleOk} />
+          <WrappedForm formDataId={this.state.formDataId} wrappedComponentRef={(form) => { this.form = form }} handleBack={this.handleOk} />
         </Modal>
       </div>
     )
@@ -232,30 +228,22 @@ class AddMetadata extends PureComponent {
     const { getFieldDecorator } = this.props.form
     return (
       <Form onSubmit={this.handleSubmit}>
-        <Form.Item
-          label='数据源Id'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('dataSourceId')(
-            <Input disabled />
-          )}
-        </Form.Item>
+        {
+          this.props.formDataId && <Form.Item
+            label='数据源Id'
+            {...formItemSettings}
+          >
+            {getFieldDecorator('dataSourceId')(
+              <Input disabled />
+            )}
+          </Form.Item>
+        }
         <Form.Item
           label='标题'
           {...formItemSettings}
         >
           {getFieldDecorator('title', {
             rules: [{ required: true, message: '请输入标题' }]
-          })(
-            <Input />
-          )}
-        </Form.Item>
-        <Form.Item
-          label='数据库名'
-          {...formItemSettings}
-        >
-          {getFieldDecorator('dbName', {
-            rules: [{ required: true, message: '请输入数据库名' }]
           })(
             <Input />
           )}
@@ -338,7 +326,8 @@ class AddMetadata extends PureComponent {
 
 AddMetadata.propTypes = {
   form: PropTypes.object,
-  handleBack: PropTypes.func
+  handleBack: PropTypes.func,
+  formDataId: PropTypes.any
 }
 
 const WrappedForm = Form.create()(AddMetadata)

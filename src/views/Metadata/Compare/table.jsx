@@ -94,6 +94,7 @@ class MetadataTableList extends PureComponent {
         console.log(res.data.data.dataList)
       } else {
         this.setState({ loading: false })
+        window._message.error(res.data.msg)
       }
     }).catch(res => {
       this.setState({ loading: false })
@@ -102,12 +103,12 @@ class MetadataTableList extends PureComponent {
   // 同步数据表
   sync = (data) => {
     utils.loading.show()
-    window._http.post('/metadata/sourceTable/sync', { dataSourceId: data.targetTableId }).then(res => {
+    window._http.post('/metadata/sourceTable/sync', { dataSourceId: data.currentTableId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
-        window._message.success('同步成功')
+        window._message.success(res.data.msg)
       } else {
-        window._message.error('同步失败')
+        window._message.error(res.data.msg)
       }
     }).catch(() => {
       utils.loading.hide()
@@ -126,7 +127,8 @@ class MetadataTableList extends PureComponent {
   amend = (data) => {
     console.log('我在修改')
     if (data.targetTable && data.targetTable.targetTableId === null) {
-      return window._message.error('目标表id不存在，无法修改！')
+      // return window._message.error('目标表id不存在，无法修改！')
+      return false
     }
     this.setState({ visible: true })
     setTimeout(() => {
@@ -138,10 +140,10 @@ class MetadataTableList extends PureComponent {
   handleOk = (data) => {
     this.setState({ visible: false, loading: true })
     data.status = data.status ? 1 : 0
-    window._http.post('metadata/targetTable/update', data).then(res => {
+    window._http.post('/metadata/targetTable/update', data).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
-        window._message.success('修改成功！')
+        window._message.success(res.data.msg)
         this.initData()
       } else {
         window._message.error(res.data.msg || '修改失败')
@@ -290,7 +292,7 @@ class MetadataTableList extends PureComponent {
 }
 MetadataTableList.propTypes = {
   match: PropTypes.object,
-  history: PropTypes.func
+  history: PropTypes.object
 }
 const formItemSettings = {
   labelCol: { span: 5 },
@@ -309,8 +311,9 @@ class AddMetadata extends Component {
   }
   setData (data) {
     data.status = !!data.status
-    const { targetTableId, targetComment, status } = data
-    this.props.form.setFieldsValue({ targetTableId, targetComment, status })
+    const { targetTableId, status } = data
+    const targetTatleComment = data.targetComment
+    this.props.form.setFieldsValue({ targetTableId, targetTatleComment, status })
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -328,7 +331,7 @@ class AddMetadata extends Component {
           label='目标版本注释'
           {...formItemSettings}
         >
-          {getFieldDecorator('targetComment', {
+          {getFieldDecorator('targetTatleComment', {
             rules: [{ required: true, message: '请输入目标版本注释' }]
           })(
             // <Input />
