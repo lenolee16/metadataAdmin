@@ -66,11 +66,10 @@ class Metadata extends PureComponent {
     this.form.props.form.resetFields()
   }
   handleOk = (values) => {
-    console.log(values)
     this.setState({
       visible: false
     })
-    if (values.dataSourceId === 'undifined') {
+    if (values.dataSourceId) {
       values.status = values.status ? 1 : 0
       window._http.post('/metadata/dataSource/update', values).then(res => {
         if (res.data.code === 0) {

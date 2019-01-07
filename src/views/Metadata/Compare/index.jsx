@@ -94,6 +94,7 @@ render () {
             title='链接地址'
             dataIndex='jdbcUrl'
             key='jdbcUrl'
+            width='150px'
           />
           <Column
             title='用户名'

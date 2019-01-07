@@ -103,7 +103,7 @@ class MetadataTableList extends PureComponent {
   // 同步数据表
   sync = (data) => {
     utils.loading.show()
-    window._http.post('/metadata/sourceTable/sync', { dataSourceId: data.currentTableId }).then(res => {
+    window._http.post('/metadata/sourceTable/sync', { sourceTableId: data.currentTableId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success(res.data.msg)
@@ -312,8 +312,8 @@ class AddMetadata extends Component {
   setData (data) {
     data.status = !!data.status
     const { targetTableId, status } = data
-    const targetTatleComment = data.targetComment
-    this.props.form.setFieldsValue({ targetTableId, targetTatleComment, status })
+    const targetTableComment = data.targetComment || ''
+    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status })
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -331,7 +331,7 @@ class AddMetadata extends Component {
           label='目标版本注释'
           {...formItemSettings}
         >
-          {getFieldDecorator('targetTatleComment', {
+          {getFieldDecorator('targetTableComment', {
             rules: [{ required: true, message: '请输入目标版本注释' }]
           })(
             // <Input />
