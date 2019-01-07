@@ -165,10 +165,10 @@ class MetadataTableList extends PureComponent {
     return tagMap[status]
   }
   // 目标版本号
-  renderPopover = (data) => {
+  renderPopover = (data, str) => {
     return (
       <div className='Popover'>
-        <p>表注释：{data.targetComment}</p>
+        <p>表注释：{data[str]}</p>
       </div>
     )
   }
@@ -198,7 +198,7 @@ class MetadataTableList extends PureComponent {
                 render={(text, values) => (
                   <>
                     {
-                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                      text ? <Popover content={this.renderPopover(values, 'targetComment')} title='详情'>
                         {values.targetVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
                       </Popover> : '-'
                     }
@@ -214,7 +214,7 @@ class MetadataTableList extends PureComponent {
                 render={(text, values) => (
                   <>
                     {
-                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                      text ? <Popover content={this.renderPopover(values, 'currentComment')} title='详情'>
                         {values.currentVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
                       </Popover> : '-'
                     }
@@ -240,7 +240,7 @@ class MetadataTableList extends PureComponent {
                 render={(text, values) => (
                   <>
                     {
-                      text ? <Popover content={this.renderPopover(values)} title='详情'>
+                      text ? <Popover content={this.renderPopover(values, 'compareComment')} title='详情'>
                         {values.compareVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
                       </Popover> : '-'
                     }
