@@ -151,6 +151,13 @@ class Metadata extends PureComponent {
               title='数据库类型'
               dataIndex='dbType'
               key='type'
+              render={(v) => {
+                if (v === 1) {
+                  return 'mysql'
+                } else if (v === 2) {
+                  return 'sqlserver'
+                }
+              }}
             />
             <Column
               title='链接地址'

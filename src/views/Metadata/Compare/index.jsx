@@ -81,12 +81,19 @@ render () {
           <Column
             title='描述'
             dataIndex='description'
-            key='des'
+            key='description'
           />
           <Column
             title='数据库类型'
             dataIndex='dbType'
-            key='type'
+            key='dbType'
+            render={(v) => {
+              if (v === 1) {
+                return 'mysql'
+              } else if (v === 2) {
+                return 'sqlserver'
+              }
+            }}
           />
           <Column
             title='链接地址'
@@ -107,7 +114,8 @@ render () {
           <Column
             title='状态'
             dataIndex='status'
-            key='state'
+            key='status'
+            render={(v) => v ? '启用' : '禁用'}
           />
           <Column
             title='操作'
