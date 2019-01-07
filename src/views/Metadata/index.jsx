@@ -172,8 +172,8 @@ class Metadata extends PureComponent {
             <Column
               title='状态'
               dataIndex='status'
-              key='state'
-              render={(v) => v.status ? 1 : 0}
+              key='status'
+              render={(v) => v ? '启用' : '禁用'}
             />
             <Column
               title='操作'

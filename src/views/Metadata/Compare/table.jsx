@@ -85,7 +85,7 @@ class MetadataTableList extends PureComponent {
   initData = () => {
     const { params: { databaseId } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/sourceTable/list', { sourceDatabaseId: databaseId }).then(res => {
+    window._http.post('/metadata/targetTable/compareTable', { sourceDatabaseId: databaseId }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
