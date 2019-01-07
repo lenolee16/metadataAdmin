@@ -13,10 +13,6 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
-      // pagination: {
-      //   pageSize: 10,
-      //   current: 1
-      // },
       formDataId: null
     }
   }
@@ -38,10 +34,6 @@ class Metadata extends PureComponent {
           data: res.data.data,
           loading: false
         })
-        // const pager = this.state.pagination
-        // pager.total = this.data.length
-        // this.setState({ pagination: pager })
-        // this.partPage(1)
       } else {
         this.setState({ loading: false })
       }
@@ -49,18 +41,6 @@ class Metadata extends PureComponent {
       this.setState({ loading: false })
     })
   }
-  // partPage = (current) => {
-  //   this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
-  // }
-  // handleTableChange = (pagination, filters, sorter) => {
-  //   console.log(pagination, filters, sorter)
-  //   const pager = { ...this.state.pagination }
-  //   pager.current = pagination.current
-  //   this.setState({
-  //     pagination: pager
-  //   })
-  //   this.partPage(pager.current)
-  // }
   handleCancel = () => {
     this.setState({ visible: false })
     this.form.props.form.resetFields()
@@ -219,7 +199,6 @@ class AddMetadata extends PureComponent {
     })
   }
   setData (data) {
-    console.log(data)
     data.status = !!data.status
     this.props.form.setFieldsValue(data)
   }

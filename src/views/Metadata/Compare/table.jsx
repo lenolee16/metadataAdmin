@@ -91,7 +91,6 @@ class MetadataTableList extends PureComponent {
           data: res.data.data.dataList,
           loading: false
         })
-        console.log(res.data.data.dataList)
       } else {
         this.setState({ loading: false })
         window._message.error(res.data.msg)
@@ -116,7 +115,6 @@ class MetadataTableList extends PureComponent {
   }
   // 查看
   examine = (data) => {
-    console.log(data.targetTable)
     if (data.targetTable && data.targetTable.targetTableId !== null) {
       this.props.history.push(`/metadataList/${this.state.dataSourceId}/${data.targetTable.targetTableId}`)
     } else {
@@ -125,14 +123,12 @@ class MetadataTableList extends PureComponent {
   }
   // 修改
   amend = (data) => {
-    console.log('我在修改')
     if (data.targetTable && data.targetTable.targetTableId === null) {
       // return window._message.error('目标表id不存在，无法修改！')
       return false
     }
     this.setState({ visible: true })
     setTimeout(() => {
-      console.log(data.targetTable)
       this.form.setData(data.targetTable)
     }, 0)
   }
