@@ -39,7 +39,7 @@ class MetadataColumnList extends PureComponent {
         const pager = this.state.pagination
         pager.total = this.data.length
         this.setState({ pagination: pager })
-        this.partPage(1)
+        this.partPage(pager.current)
       }
     }).catch(() => {
       this.setState({ loading: false })
@@ -79,6 +79,7 @@ class MetadataColumnList extends PureComponent {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
+        this.queryData()
       } else {
         window._message.success('同步失败！')
       }
