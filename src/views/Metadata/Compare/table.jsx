@@ -21,59 +21,59 @@ class MetadataTableList extends PureComponent {
   componentDidMount () {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
-    this.data = [{
-      targetTableId: '1',
-      tableName: 'tablesName',
-      targetComment: 'targetComment',
-      targetStatus: '1',
-      targetVersionNo: '12245.15425.54',
-      currentComment: 'currentComment',
-      currentStatus: '1',
-      currentToTarget: '3',
-      currentToTargetTxt: '表存在变化',
-      compareVersionNo: '121.155.125',
-      compareComment: 'compareComment',
-      compareStatus: '1',
-      compareToCurrent: '2',
-      compareToCurrentTxt: '表字段存在变化',
-      currentVersionNo: '125.125.152',
-      targetTable: {
-        targetTableId: 0,
-        sourceDbId: 0,
-        sourceTableName: 'string',
-        status: 0,
-        targetComment: 'string',
-        tableName: 'string',
-        targetVersionNo: 0
-      }
-    }, {
-      targetTableId: '2',
-      tableName: '数据表名',
-      targetComment: '目标注释',
-      targetStatus: '1',
-      targetVersionNo: '12245.15425.54',
-      currentComment: '当前注释',
-      currentStatus: '1',
-      currentToTarget: '4',
-      currentToTargetTxt: '表字段有变化',
-      currentVersionNo: '125.125.152',
-      compareComment: '上一次注释',
-      compareStatus: '1',
-      compareToCurrent: '1',
-      compareToCurrentTxt: '有变化',
-      compareVersionNo: '121.155.125',
-      targetTable: {
-        targetTableId: 1,
-        sourceDbId: 0,
-        sourceTableName: 'string',
-        status: 0,
-        targetComment: 'string',
-        tableName: 'string',
-        targetVersionNo: 0
-      }
-    }]
-    this.setState({ data: this.data })
-    // this.initData()
+    // this.data = [{
+    //   currentTableId: '1',
+    //   tableName: 'tablesName',
+    //   targetComment: 'targetComment',
+    //   targetStatus: '1',
+    //   targetVersionNo: '12245.15425.54',
+    //   currentComment: 'currentComment',
+    //   currentStatus: '1',
+    //   currentToTarget: '3',
+    //   currentToTargetTxt: '表存在变化',
+    //   compareVersionNo: '121.155.125',
+    //   compareComment: 'compareComment',
+    //   compareStatus: '1',
+    //   compareToCurrent: '2',
+    //   compareToCurrentTxt: '表字段存在变化',
+    //   currentVersionNo: '125.125.152',
+    //   targetTable: {
+    //     targetTableId: 0,
+    //     sourceDbId: 0,
+    //     sourceTableName: 'string',
+    //     status: 0,
+    //     targetComment: 'string',
+    //     tableName: 'string',
+    //     targetVersionNo: 0
+    //   }
+    // }, {
+    //   currentTableId: '2',
+    //   tableName: '数据表名',
+    //   targetComment: '目标注释',
+    //   targetStatus: '1',
+    //   targetVersionNo: '12245.15425.54',
+    //   currentComment: '当前注释',
+    //   currentStatus: '1',
+    //   currentToTarget: '4',
+    //   currentToTargetTxt: '表字段有变化',
+    //   currentVersionNo: '125.125.152',
+    //   compareComment: '上一次注释',
+    //   compareStatus: '1',
+    //   compareToCurrent: '1',
+    //   compareToCurrentTxt: '有变化',
+    //   compareVersionNo: '121.155.125',
+    //   targetTable: {
+    //     targetTableId: 1,
+    //     sourceDbId: 0,
+    //     sourceTableName: 'string',
+    //     status: 0,
+    //     targetComment: 'string',
+    //     tableName: 'string',
+    //     targetVersionNo: 0
+    //   }
+    // }]
+    // this.setState({ data: this.data })
+    this.initData()
   }
   filter = (val) => {
     if (!val) {
@@ -85,7 +85,7 @@ class MetadataTableList extends PureComponent {
   initData = () => {
     const { params: { databaseId } } = this.props.match
     this.setState({ loading: true })
-    window._http.post('/metadata/dataSource/list', { sourceDatabaseId: databaseId }).then(res => {
+    window._http.post('/metadata/sourceTable/list', { sourceDatabaseId: databaseId }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -184,7 +184,7 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table bordered rowKey='targetTableId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table bordered rowKey='currentTableId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='数据表名称'
               dataIndex='tableName'

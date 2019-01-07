@@ -21,140 +21,7 @@ class Metadata extends PureComponent {
     }
   }
   componentDidMount () {
-    this.data = [{
-      dataSourceId: '1',
-      title: 'title',
-      dbName: 'dbName',
-      description: 'description',
-      dbType: 'mysql',
-      jdbcUrl: 'jdbcUrl',
-      status: 1,
-      user: 'user',
-      password: 'password'
-    }, {
-      dataSourceId: '2',
-      title: '所属',
-      dbName: 'Jim Green',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 1,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '3',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '4',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '5',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '6',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '7',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '8',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '9',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '10',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '11',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '12',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '13',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: 0,
-      user: '用户名',
-      password: '密码'
-    }]
-    this.setState({ data: this.data })
-    // this.initData()
-    // this.wrappedForm.current.focusTextInput()
+    this.initData()
   }
   filter = (val) => {
     if (!val) {
@@ -241,9 +108,9 @@ class Metadata extends PureComponent {
     window._http.post('/metadata/dataSource/test', { dataSourceId: data.dataSourceId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
-        window._notification.success('请求成功')
+        window._notification.success({ message: res.data.msg })
       } else {
-        window._notification.error('请求失败')
+        window._notification.error({ message: res.data.msg })
       }
     }).catch(() => {
       utils.loading.hide()
@@ -289,6 +156,7 @@ class Metadata extends PureComponent {
               title='链接地址'
               dataIndex='jdbcUrl'
               key='jdbcUrl'
+              width='150px'
             />
             <Column
               title='用户名'

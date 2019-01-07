@@ -17,40 +17,7 @@ class MetadataList extends PureComponent {
     }
   }
   componentDidMount () {
-    this.data = [{
-      dataSourceId: '1',
-      title: '所属',
-      dbName: 'John Brown',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '2',
-      title: '所属',
-      dbName: 'Jim Green',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
-    }, {
-      dataSourceId: '3',
-      title: '所属',
-      dbName: 'Joe Black',
-      description: '描述',
-      dbType: 'mysql',
-      jdbcUrl: '链接',
-      status: '0',
-      user: '用户名',
-      password: '密码'
-    }]
-    this.setState({ data: this.data })
-  // this.initData()
-  // this.wrappedForm.current.focusTextInput()
+    this.initData()
   }
 filter = (val) => {
   if (!val) {
