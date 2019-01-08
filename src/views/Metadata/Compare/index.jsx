@@ -47,6 +47,7 @@ sync = (data) => {
   window._http.post('/metadata/dataSource/sync', { dataSourceId: data.dataSourceId }).then(res => {
     utils.loading.hide()
     if (res.data.code === 0) {
+      this.initData()
       window._message.success(res.data.msg)
     } else {
       window._message.error(res.data.msg)
