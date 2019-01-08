@@ -17,7 +17,8 @@ class MetadataColumnList extends PureComponent {
         current: 1
       },
       formDataId: null,
-      loading: false
+      loading: false,
+      filteredInfo: null
     }
   }
   filter = (val) => {
@@ -36,10 +37,11 @@ class MetadataColumnList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
-        const pager = this.state.pagination
-        pager.total = this.data.length
-        this.setState({ pagination: pager })
-        this.partPage(pager.current)
+        // const pager = this.state.pagination
+        // pager.total = this.data.length
+        // this.setState({ pagination: pager })
+        // this.partPage(pager.current)
+        this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
       }
@@ -48,12 +50,9 @@ class MetadataColumnList extends PureComponent {
     })
   }
   handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
     this.setState({
-      pagination: pager
+      filteredInfo: filters
     })
-    this.partPage(pager.current)
   }
   partPage = (current) => {
     this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
@@ -77,7 +76,7 @@ class MetadataColumnList extends PureComponent {
   sync = (data) => {
     utils.loading.show()
     const { params: { databaseId, id } } = this.props.match
-    window._http.post('/metadata/sourceField/sync', { sourceDatabaseId: databaseId, targetTableId: id, targetFieldName: data.targetFieldName }).then(res => {
+    window._http.post('/metadata/sourceField/sync', { dataSourceId: databaseId, targetTableId: id, targetFieldName: data.targetFieldName }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success('同步成功！')
@@ -120,6 +119,13 @@ class MetadataColumnList extends PureComponent {
     )
   }
   render () {
+    const filters = [
+      { text: '无变化', value: 0 },
+      { text: '有新增', value: 3 },
+      { text: '有修改', value: 4 }
+    ]
+    let { filteredInfo } = this.state
+    filteredInfo = filteredInfo || {}
     return (
       <div className='MetadataSearch'>
         <Card title='数据列'>
@@ -134,7 +140,7 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetFieldName' bordered pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
+          <Table rowKey='targetFieldName' bordered onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} >
             <Column
               title='字段名称'
               dataIndex='targetFieldName'
@@ -175,6 +181,9 @@ class MetadataColumnList extends PureComponent {
                 title='当前状态'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
+                filters={filters}
+                filteredValue={filteredInfo.currentToTarget}
+                onFilter={(value, record) => value.includes(`${record.currentToTarget}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
@@ -201,6 +210,9 @@ class MetadataColumnList extends PureComponent {
                 title='上一次状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
+                filters={filters}
+                filteredValue={filteredInfo.compareToCurrent}
+                onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
