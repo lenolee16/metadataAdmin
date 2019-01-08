@@ -28,8 +28,8 @@ class MetadataList extends PureComponent {
     window._http.post('/metadata/dataSource/list').then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.data = res.data.data
-        this.setState({ data: res.data.data })
+        this.data = res.data.data.filter(item => item.status === 1)
+        this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
       }

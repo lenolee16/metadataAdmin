@@ -1,8 +1,9 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
-// import { Link } from 'react-router-dom'
+// import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
 import utils from 'utils'
+import Ellipsis from 'components/Ellipsis'
 const { Column, ColumnGroup } = Table
 const { Search } = Input
 
@@ -152,7 +153,7 @@ class MetadataTableList extends PureComponent {
               key='tableName'
             />
             <ColumnGroup title='目标版本' >
-              <Column
+              {/* <Column
                 title='目标版本号'
                 dataIndex='targetVersionNo'
                 key='targetVersionNo'
@@ -165,10 +166,19 @@ class MetadataTableList extends PureComponent {
                     }
                   </>
                 )}
+              /> */}
+              <Column
+                title='目标注释'
+                dataIndex='targetComment'
+                key='targetComment'
+                width='200px'
+                render={(text) => (
+                  <Ellipsis content={text} style={{ width: 150 }} />
+                )}
               />
             </ColumnGroup>
             <ColumnGroup title='当前快照与目标版本对比' >
-              <Column
+              {/* <Column
                 title='当前版本号'
                 dataIndex='currentVersionNo'
                 key='currentVersionNo'
@@ -180,6 +190,15 @@ class MetadataTableList extends PureComponent {
                       </Popover> : '-'
                     }
                   </>
+                )}
+              /> */}
+              <Column
+                title='当前注释'
+                dataIndex='currentComment'
+                key='currentComment'
+                width='200px'
+                render={(text) => (
+                  <Ellipsis content={text} style={{ width: 150 }} />
                 )}
               />
               <Column
@@ -197,7 +216,7 @@ class MetadataTableList extends PureComponent {
               />
             </ColumnGroup>
             <ColumnGroup title='上一次快照与当前快照对比'>
-              <Column
+              {/* <Column
                 title='上一次版本号'
                 dataIndex='compareVersionNo'
                 key='compareVersionNo'
@@ -209,6 +228,15 @@ class MetadataTableList extends PureComponent {
                       </Popover> : '-'
                     }
                   </>
+                )}
+              /> */}
+              <Column
+                title='上一次注释'
+                dataIndex='compareComment'
+                key='compareComment'
+                width={200}
+                render={(text) => (
+                  <Ellipsis content={text} style={{ width: 150 }} />
                 )}
               />
               <Column

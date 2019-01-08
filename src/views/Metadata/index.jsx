@@ -199,6 +199,7 @@ class AddMetadata extends PureComponent {
   }
   setData (data) {
     data.status = !!data.status
+    data.dbType = '' + data.dbType
     this.props.form.setFieldsValue(data)
   }
   render () {
