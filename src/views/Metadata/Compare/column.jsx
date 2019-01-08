@@ -263,7 +263,7 @@ class AddMetadata extends Component {
         values.status = values.status ? 1 : 0
         const { params: { databaseId, id } } = this.props.match
         if (this.props.formDataId !== null) {
-          window._http.post(`/metadata/targetField/update`, { dataSourceId: databaseId, sourceTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/update`, { dataSourceId: databaseId, targetTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
@@ -273,7 +273,7 @@ class AddMetadata extends Component {
             }
           })
         } else {
-          window._http.post(`/metadata/targetField/add`, { dataSourceId: databaseId, sourceTableId: id, ...values }).then(res => {
+          window._http.post(`/metadata/targetField/add`, { dataSourceId: databaseId, targetTableId: id, ...values }).then(res => {
             if (res.data.code === 0) {
               this.props.form.resetFields()
               this.props.handleBack()
