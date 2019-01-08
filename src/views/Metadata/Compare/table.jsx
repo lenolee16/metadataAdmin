@@ -12,92 +12,59 @@ class MetadataTableList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
+      pagination: {
+        pageSize: 10,
+        current: 1
+      },
       // 数据源id
       dataSourceId: null,
       loading: false
-      // formData: null
     }
   }
   componentDidMount () {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
-    // this.data = [{
-    //   currentTableId: '1',
-    //   tableName: 'tablesName',
-    //   targetComment: 'targetComment',
-    //   targetStatus: '1',
-    //   targetVersionNo: '12245.15425.54',
-    //   currentComment: 'currentComment',
-    //   currentStatus: '1',
-    //   currentToTarget: '3',
-    //   currentToTargetTxt: '表存在变化',
-    //   compareVersionNo: '121.155.125',
-    //   compareComment: 'compareComment',
-    //   compareStatus: '1',
-    //   compareToCurrent: '2',
-    //   compareToCurrentTxt: '表字段存在变化',
-    //   currentVersionNo: '125.125.152',
-    //   targetTable: {
-    //     targetTableId: 0,
-    //     sourceDbId: 0,
-    //     sourceTableName: 'string',
-    //     status: 0,
-    //     targetComment: 'string',
-    //     tableName: 'string',
-    //     targetVersionNo: 0
-    //   }
-    // }, {
-    //   currentTableId: '2',
-    //   tableName: '数据表名',
-    //   targetComment: '目标注释',
-    //   targetStatus: '1',
-    //   targetVersionNo: '12245.15425.54',
-    //   currentComment: '当前注释',
-    //   currentStatus: '1',
-    //   currentToTarget: '4',
-    //   currentToTargetTxt: '表字段有变化',
-    //   currentVersionNo: '125.125.152',
-    //   compareComment: '上一次注释',
-    //   compareStatus: '1',
-    //   compareToCurrent: '1',
-    //   compareToCurrentTxt: '有变化',
-    //   compareVersionNo: '121.155.125',
-    //   targetTable: {
-    //     targetTableId: 1,
-    //     sourceDbId: 0,
-    //     sourceTableName: 'string',
-    //     status: 0,
-    //     targetComment: 'string',
-    //     tableName: 'string',
-    //     targetVersionNo: 0
-    //   }
-    // }]
-    // this.setState({ data: this.data })
     this.initData()
   }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.data.filter(item => item.tableName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    const data = this.data.filter(item => item.tableName.toLocaleLowerCase().includes(val.toLocaleLowerCase()))
+    const pager = this.state.pagination
+    pager.total = data.length
+    this.setState({ data: data, pagination: pager })
   }
   // 初始化table
   initData = () => {
     const { params: { databaseId } } = this.props.match
     this.setState({ loading: true })
     window._http.post('/metadata/targetTable/compareTable', { sourceDatabaseId: databaseId }).then(res => {
+      this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.setState({
-          data: res.data.data.dataList,
-          loading: false
-        })
+        this.data = res.data.data.dataList
+        const pager = this.state.pagination
+        pager.total = this.data.length
+        this.setState({ pagination: pager })
+        this.partPage(pager.current)
       } else {
-        this.setState({ loading: false })
         window._message.error(res.data.msg)
       }
     }).catch(res => {
       this.setState({ loading: false })
     })
+  }
+  // 修改分页
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
+    this.setState({
+      pagination: pager
+    })
+    this.partPage(pager.current)
+  }
+  partPage = (current) => {
+    this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   // 同步数据表
   sync = (data) => {
@@ -135,7 +102,9 @@ class MetadataTableList extends PureComponent {
   }
   // 传入表单回调
   handleOk = (data) => {
-    this.setState({ visible: false, loading: true })
+    const pager = this.state.pagination
+    pager.current = 1
+    this.setState({ visible: false, loading: true, pagination: pager })
     data.status = data.status ? 1 : 0
     window._http.post('/metadata/targetTable/update', data).then(res => {
       this.setState({ loading: false })
@@ -185,7 +154,7 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table bordered rowKey='currentTableId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table bordered rowKey='currentTableId' pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
             <Column
               title='数据表名称'
               dataIndex='tableName'

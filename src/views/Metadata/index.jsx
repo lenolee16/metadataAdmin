@@ -13,6 +13,10 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
+      pagination: {
+        pageSize: 10,
+        current: 1
+      },
       formDataId: null
     }
   }
@@ -20,35 +24,53 @@ class Metadata extends PureComponent {
     this.initData()
   }
   filter = (val) => {
+    console.log(val)
     if (!val) {
       return this.setState({ data: this.data })
     }
-    this.setState({ data: this.state.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
+    const data = this.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase()))
+    const pager = this.state.pagination
+    pager.total = data.length
+    this.setState({ data: data, pagination: pager })
   }
   // 初始化table
   initData = () => {
     this.setState({ loading: true })
     window._http.post('/metadata/dataSource/list').then(res => {
+      this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.setState({
-          data: res.data.data,
-          loading: false
-        })
+        this.data = res.data.data
+        const pager = this.state.pagination
+        pager.total = this.data.length
+        this.setState({ pagination: pager })
+        this.partPage(pager.current)
       } else {
-        this.setState({ loading: false })
+        window._message.error(res.data.msg || '查询失败')
       }
     }).catch(res => {
       this.setState({ loading: false })
     })
+  }
+  // 修改分页
+  handleTableChange = (pagination, filters, sorter) => {
+    const pager = { ...this.state.pagination }
+    pager.current = pagination.current
+    this.setState({
+      pagination: pager
+    })
+    this.partPage(pager.current)
+  }
+  partPage = (current) => {
+    this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   handleCancel = () => {
     this.setState({ visible: false })
     this.form.props.form.resetFields()
   }
   handleOk = (values) => {
-    this.setState({
-      visible: false
-    })
+    const pager = this.state.pagination
+    pager.current = 1
+    this.setState({ visible: false, pagination: pager })
     if (values.dataSourceId) {
       values.status = values.status ? 1 : 0
       window._http.post('/metadata/dataSource/update', values).then(res => {
@@ -111,7 +133,7 @@ class Metadata extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='dataSourceId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table rowKey='dataSourceId' pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
             <Column
               title='标题'
               dataIndex='title'
