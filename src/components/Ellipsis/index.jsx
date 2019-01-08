@@ -1,9 +1,9 @@
-import React, { PureComponent } from 'react'
+import React, { Component } from 'react'
 import PropTypes from 'prop-types'
 import { Tooltip } from 'antd'
 import './index.less'
 
-class Ellipsis extends PureComponent {
+class Ellipsis extends Component {
   constructor (props) {
     super(props)
     this.ellipsisRef = React.createRef()
@@ -14,10 +14,17 @@ class Ellipsis extends PureComponent {
   componentDidMount () {
     this.updateStatus()
   }
+  componentWillReceiveProps (nextProps) {
+    if (nextProps.content !== this.props.content) {
+      setTimeout(() => this.updateStatus(), 0)
+    }
+  }
   updateStatus () {
     let el = this.ellipsisRef.current
     if (el.clientWidth < el.scrollWidth) {
       this.setState({ isEllipsis: true })
+    } else {
+      this.setState({ isEllipsis: false })
     }
   }
   render () {
