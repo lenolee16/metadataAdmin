@@ -20,3 +20,6 @@
 .Popover p{
   margin-bottom: 5px;
 }
+.smallSizeTable .ant-table{
+  font-size: 12px;
+}

@@ -4,7 +4,7 @@ import { message } from 'antd'
 // create an axios instance
 const api = process.env.NODE_ENV !== 'production' ? '/metadata_manager_api' : '/metadata_manager_api'
 const service = axios.create({
-  timeout: 15000
+  timeout: 90000
 })
 
 // request interceptor

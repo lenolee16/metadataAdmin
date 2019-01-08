@@ -1,6 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Button, Input, Form, Switch, Modal, Table, Tag, Radio, Popover, Icon } from 'antd'
+import Ellipsis from 'components/Ellipsis'
 import utils from 'utils'
 
 const { Search } = Input
@@ -12,10 +13,6 @@ class MetadataColumnList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
-      pagination: {
-        pageSize: 10,
-        current: 1
-      },
       formDataId: null,
       loading: false,
       filteredInfo: null
@@ -133,22 +130,58 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetFieldName' bordered onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} >
+          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: 500 }} >
             <Column
               title='字段名称'
               dataIndex='targetFieldName'
               key='targetFieldName'
+              width={150}
+              render={(text) => (
+                <b>{text}</b>
+              )}
             />
             <ColumnGroup title='目标'>
               <Column
-                title='目标版本号'
+                title='注释'
+                dataIndex='targetField.targetFieldComment'
+                key='targetField.targetFieldComment'
+                width={150}
+                render={(text) => (
+                  <Ellipsis content={text} style={{ width: 100 }} />
+                )}
+              />
+              <Column
+                title='类型（长度）'
+                dataIndex='targetField'
+                key='targetField.targetFieldType'
+                width={150}
+                render={(text) => (
+                  <>
+                    {text.targetFieldType}({text.targetFieldSize})
+                  </>
+                )}
+              />
+              <Column
+                title='是否主键'
+                dataIndex='targetField.targetFieldPri'
+                key='targetField.targetFieldPri'
+                width={90}
+                render={(text) => (
+                  <span>
+                    {text ? '是' : '否'}
+                  </span>
+                )}
+              />
+              <Column
+                title='其他信息'
                 dataIndex='targetField'
                 key='targetField'
+                width={90}
                 render={(text) => (
                   <>
                     {
                       text ? <Popover content={this.renderTargetPopover(text)} title='详情'>
-                        {text.targetVereseionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
+                        详情<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
                       </Popover> : '-'
                     }
                   </>
@@ -157,23 +190,10 @@ class MetadataColumnList extends PureComponent {
             </ColumnGroup>
             <ColumnGroup title='当前快照'>
               <Column
-                title='当前版本号'
-                dataIndex='currentField'
-                key='currentField'
-                render={(text) => (
-                  <>
-                    {
-                      text ? <Popover content={this.renderPopover(text)} title='详情'>
-                        {text.sourceVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
-                      </Popover> : '-'
-                    }
-                  </>
-                )}
-              />
-              <Column
                 title='当前状态'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
+                width={180}
                 filters={filters}
                 filteredValue={filteredInfo.currentToTarget}
                 onFilter={(value, record) => value.includes(`${record.currentToTarget}`)}
@@ -186,23 +206,10 @@ class MetadataColumnList extends PureComponent {
             </ColumnGroup>
             <ColumnGroup title='上一次快照'>
               <Column
-                title='上一次版本号'
-                dataIndex='compareField'
-                key='compareField'
-                render={(text) => (
-                  <>
-                    {
-                      text ? <Popover content={this.renderPopover(text)} title='详情'>
-                        {text.sourceVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
-                      </Popover> : '-'
-                    }
-                  </>
-                )}
-              />
-              <Column
                 title='上一次状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
+                width={180}
                 filters={filters}
                 filteredValue={filteredInfo.compareToCurrent}
                 onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
