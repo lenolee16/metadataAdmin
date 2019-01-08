@@ -215,9 +215,6 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
-                filters={filters}
-                filteredValue={filteredInfo.compareToCurrent}
-                onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
