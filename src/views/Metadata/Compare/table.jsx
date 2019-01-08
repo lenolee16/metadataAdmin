@@ -14,8 +14,8 @@ class MetadataTableList extends PureComponent {
       visible: false,
       // 数据源id
       dataSourceId: null,
-      loading: false
-      // formData: null
+      loading: false,
+      filteredInfo: null
     }
   }
   componentDidMount () {
@@ -119,7 +119,21 @@ class MetadataTableList extends PureComponent {
       </div>
     )
   }
+  handleTableChange = (pagination, filters, sorter) => {
+    this.setState({
+      filteredInfo: filters
+    })
+  }
   render () {
+    const filters = [
+      { text: '无变化', value: 0 },
+      { text: '表存在变化', value: 1 },
+      { text: '表属性变化', value: 2 },
+      { text: '标字段有删减', value: 3 },
+      { text: '表字段属性有变化', value: 4 }
+    ]
+    let { filteredInfo } = this.state
+    filteredInfo = filteredInfo || {}
     return (
       <div className='MetadataSearch'>
         <Card title='数据表'>
@@ -131,7 +145,7 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table bordered rowKey='currentTableId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table bordered rowKey='currentTableId' onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='数据表名称'
               dataIndex='tableName'
@@ -172,6 +186,9 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
+                filters={filters}
+                filteredValue={filteredInfo.currentToTarget}
+                onFilter={(value, record) => value.includes(`${record.currentToTarget}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
@@ -198,6 +215,9 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
+                filters={filters}
+                filteredValue={filteredInfo.compareToCurrent}
+                onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
