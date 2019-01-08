@@ -37,10 +37,6 @@ class MetadataColumnList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
-        // const pager = this.state.pagination
-        // pager.total = this.data.length
-        // this.setState({ pagination: pager })
-        // this.partPage(pager.current)
         this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
@@ -53,9 +49,6 @@ class MetadataColumnList extends PureComponent {
     this.setState({
       filteredInfo: filters
     })
-  }
-  partPage = (current) => {
-    this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   handleCancel = () => {
     this.setState({ visible: false, formDataId: null })
@@ -226,7 +219,7 @@ class MetadataColumnList extends PureComponent {
               render={(text, record) => (
                 <>
                   <Button type='primary' icon='edit' disabled={!record.targetField} ghost style={{ marginRight: '10px' }} onClick={() => this.edit(record)}>修改</Button>
-                  <Button type='danger' icon='sync' ghost onClick={() => this.sync(record)}>同步</Button>
+                  <Button type='danger' icon='sync' disabled={record.compareToCurrent === 0 && record.currentToTarget === 0} ghost onClick={() => this.sync(record)}>同步</Button>
                 </>
               )}
             />
