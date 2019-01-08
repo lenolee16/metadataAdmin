@@ -129,7 +129,7 @@ class MetadataTableList extends PureComponent {
       { text: '无变化', value: 0 },
       { text: '表存在变化', value: 1 },
       { text: '表属性变化', value: 2 },
-      { text: '标字段有删减', value: 3 },
+      { text: '表字段有变化', value: 3 },
       { text: '表字段属性有变化', value: 4 }
     ]
     let { filteredInfo } = this.state
