@@ -10,12 +10,7 @@ class MetadataList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
-      pagination: {
-        pageSize: 10,
-        current: 1
-      },
-      loading: false,
-      formData: null
+      loading: false
     }
   }
   componentDidMount () {
@@ -23,12 +18,9 @@ class MetadataList extends PureComponent {
   }
   filter = (val) => {
     if (!val) {
-      return this.setState({ data: this.state.data })
+      return this.setState({ data: this.data })
     }
-    const data = this.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase()))
-    const pager = this.state.pagination
-    pager.total = data.length
-    this.setState({ data: data, pagination: pager })
+    this.setState({ data: this.data.filter(item => item.title.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   // 初始化table
   initData = () => {
@@ -37,28 +29,13 @@ class MetadataList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data
-        const pager = this.state.pagination
-        pager.total = this.data.length
-        this.setState({ pagination: pager })
-        this.partPage(pager.current)
+        this.setState({ data: res.data.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
       }
     }).catch(res => {
       this.setState({ loading: false })
     })
-  }
-  // 修改分页
-  handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager
-    })
-    this.partPage(pager.current)
-  }
-  partPage = (current) => {
-    this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   // 同步 /metadata/dataSource/sync
   sync = (data) => {
@@ -87,7 +64,7 @@ class MetadataList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='dataSourceId' pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
+          <Table rowKey='dataSourceId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='标题'
               dataIndex='title'
@@ -137,10 +114,10 @@ class MetadataList extends PureComponent {
               title='操作'
               key='action'
               render={(text, record) => (
-                <>
-                  <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
-                  <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
-                </>
+                  <>
+                    <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
+                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                  </>
               )}
             />
           </Table>

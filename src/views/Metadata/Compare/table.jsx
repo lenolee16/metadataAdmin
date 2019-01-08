@@ -12,13 +12,10 @@ class MetadataTableList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
-      pagination: {
-        pageSize: 10,
-        current: 1
-      },
       // 数据源id
       dataSourceId: null,
       loading: false
+      // formData: null
     }
   }
   componentDidMount () {
@@ -30,10 +27,7 @@ class MetadataTableList extends PureComponent {
     if (!val) {
       return this.setState({ data: this.data })
     }
-    const data = this.data.filter(item => item.tableName.toLocaleLowerCase().includes(val.toLocaleLowerCase()))
-    const pager = this.state.pagination
-    pager.total = data.length
-    this.setState({ data: data, pagination: pager })
+    this.setState({ data: this.data.filter(item => item.tableName.toLocaleLowerCase().includes(val.toLocaleLowerCase())) })
   }
   // 初始化table
   initData = () => {
@@ -43,28 +37,13 @@ class MetadataTableList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
-        const pager = this.state.pagination
-        pager.total = this.data.length
-        this.setState({ pagination: pager })
-        this.partPage(pager.current)
+        this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg)
       }
     }).catch(res => {
       this.setState({ loading: false })
     })
-  }
-  // 修改分页
-  handleTableChange = (pagination, filters, sorter) => {
-    const pager = { ...this.state.pagination }
-    pager.current = pagination.current
-    this.setState({
-      pagination: pager
-    })
-    this.partPage(pager.current)
-  }
-  partPage = (current) => {
-    this.setState({ data: this.data.slice((current - 1) * this.state.pagination.pageSize, current * this.state.pagination.pageSize) })
   }
   // 同步数据表
   sync = (data) => {
@@ -102,9 +81,7 @@ class MetadataTableList extends PureComponent {
   }
   // 传入表单回调
   handleOk = (data) => {
-    const pager = this.state.pagination
-    pager.current = 1
-    this.setState({ visible: false, loading: true, pagination: pager })
+    this.setState({ visible: false, loading: true })
     data.status = data.status ? 1 : 0
     window._http.post('/metadata/targetTable/update', data).then(res => {
       this.setState({ loading: false })
@@ -154,7 +131,7 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table bordered rowKey='currentTableId' pagination={this.state.pagination} dataSource={this.state.data} loading={this.state.loading} onChange={this.handleTableChange}>
+          <Table bordered rowKey='currentTableId' dataSource={this.state.data} loading={this.state.loading}>
             <Column
               title='数据表名称'
               dataIndex='tableName'
@@ -234,10 +211,9 @@ class MetadataTableList extends PureComponent {
               width='200'
               render={(text, record) => (
                   <>
-                    {/* <Link to={`/metadataList/${this.state.dataSourceId}/${record.targetTableId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={()=>this.} >查看</Button></Link> */}
                     <Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
                     <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
-                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Button type='danger' disabled={record.compareToCurrent === 0 && record.currentToTarget === 0} ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
             />
