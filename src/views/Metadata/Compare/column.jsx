@@ -219,7 +219,7 @@ class MetadataColumnList extends PureComponent {
               render={(text, record) => (
                 <>
                   <Button type='primary' icon='edit' disabled={!record.targetField} ghost style={{ marginRight: '10px' }} onClick={() => this.edit(record)}>修改</Button>
-                  <Button type='danger' icon='sync' disabled={record.compareToCurrent === 0 && record.currentToTarget === 0} ghost onClick={() => this.sync(record)}>同步</Button>
+                  <Button type='danger' icon='sync' disabled={record.currentToTarget === 0} ghost onClick={() => this.sync(record)}>同步</Button>
                 </>
               )}
             />
