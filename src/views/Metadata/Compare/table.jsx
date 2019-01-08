@@ -215,6 +215,7 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
+                filters={filters}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
@@ -230,7 +231,7 @@ class MetadataTableList extends PureComponent {
                   <>
                     <Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
                     <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
-                    <Button type='danger' disabled={record.compareToCurrent === 0 && record.currentToTarget === 0} ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Button type='danger' disabled={record.currentToTarget === 0} ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
             />
