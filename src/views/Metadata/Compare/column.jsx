@@ -52,9 +52,7 @@ class MetadataColumnList extends PureComponent {
     this.form.props.form.resetFields()
   }
   handleOk = () => {
-    const pager = this.state.pagination
-    pager.current = 1
-    this.setState({ visible: false, formDataId: null, pagination: pager })
+    this.setState({ visible: false, formDataId: null })
     this.queryData()
   }
   edit = (data) => {
