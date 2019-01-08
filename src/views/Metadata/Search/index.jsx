@@ -47,7 +47,7 @@ class MetadataSearch extends PureComponent {
             <Button type='primary' size='large' icon='search' onClick={this.search} loading={this.state.loading}>搜索</Button>
           </div>
           {this.state.isSearched ? <div className='searchResult'>
-            <Table dataSource={this.state.data} rowKey='targetTableId' loading={this.state.loading}>
+            <Table dataSource={this.state.data} rowKey={(record) => `${record.targetTableId}-${record.targetFieldId || ''}`} loading={this.state.loading}>
               <Column
                 title='数据源名'
                 dataIndex='dataSourceName'
