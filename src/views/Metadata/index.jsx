@@ -48,7 +48,7 @@ class Metadata extends PureComponent {
     this.setState({
       visible: false
     })
-    if (values.dataSourceId) {
+    if (this.state.formDataId !== null) {
       values.status = values.status ? 1 : 0
       window._http.post('/metadata/dataSource/update', values).then(res => {
         if (res.data.code === 0) {
@@ -77,6 +77,13 @@ class Metadata extends PureComponent {
   // 点击修改按钮
   amend = (data) => {
     this.setState({ visible: true, formDataId: data.dataSourceId })
+    setTimeout(() => {
+      this.form.setData(data)
+    }, 0)
+  }
+  // 点击复制按钮
+  copy = (data) => {
+    this.setState({ visible: true, formDataId: null })
     setTimeout(() => {
       this.form.setData(data)
     }, 0)
@@ -162,6 +169,7 @@ class Metadata extends PureComponent {
               render={(text, record) => (
                 <>
                   <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
+                  <Button type='primary' ghost icon='copy' onClick={() => this.copy(record)} style={{ marginRight: '10px' }}>复制</Button>
                   <Button type='primary' ghost icon='file-sync' style={{ color: '#4eca6a', borderColor: '#4eca6a' }} onClick={() => this.testFnc(record)}>测试</Button>
                 </>
               )}
@@ -200,7 +208,12 @@ class AddMetadata extends PureComponent {
   setData (data) {
     data.status = !!data.status
     data.dbType = '' + data.dbType
-    this.props.form.setFieldsValue(data)
+    const { dataSourceId, title, description, dbType, jdbcUrl, password, status, user } = data
+    if (this.props.formDataId === null) {
+      this.props.form.setFieldsValue({ title, description, dbType, jdbcUrl, password, status, user })
+    } else {
+      this.props.form.setFieldsValue({ dataSourceId, title, description, dbType, jdbcUrl, password, status, user })
+    }
   }
   render () {
     const { getFieldDecorator } = this.props.form
