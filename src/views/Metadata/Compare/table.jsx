@@ -3,6 +3,7 @@ import PropTypes from 'prop-types'
 // import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
 import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
 import utils from 'utils'
+// import { exportExcel } from 'xlsx-oc'
 import Ellipsis from 'components/Ellipsis'
 const { Column, ColumnGroup } = Table
 const { Search } = Input
@@ -20,6 +21,8 @@ class MetadataTableList extends PureComponent {
     }
   }
   componentDidMount () {
+    // 初始化需要导出的数组
+    this.selectData = []
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
@@ -120,10 +123,22 @@ class MetadataTableList extends PureComponent {
       </div>
     )
   }
+  // 筛选变化
   handleTableChange = (pagination, filters, sorter) => {
     this.setState({
       filteredInfo: filters
     })
+  }
+  // 导出选中数据表
+  export = () => {
+    if (this.selectData.length > 0) {
+      console.log(this.selectData)
+      // let _headers = [{ k: 'tableName', v: '表名' }, { k: 'targetComment', v: '目标注释' },
+      //   { k: 'currentComment', v: '当前注释' }, { k: 'compareComment', v: '上一次注释' } ]
+      // exportExcel(_headers, this.selectData)
+    } else {
+      window._message.error('请选择需要导出的表')
+    }
   }
   render () {
     const filters = [
@@ -135,10 +150,18 @@ class MetadataTableList extends PureComponent {
     ]
     let { filteredInfo } = this.state
     filteredInfo = filteredInfo || {}
+    const rowSelection = {
+      onChange: (selectedRowKeys, selectedRows) => {
+        this.selectData = selectedRows
+      }
+    }
     return (
       <div className='MetadataSearch'>
         <Card title='数据表'>
           <div className='clearfix' style={{ marginBottom: 12 }}>
+            <Button type='primary' onClick={this.export}>
+              导出
+            </Button>
             <Search
               className='fr'
               placeholder='数据表名称'
@@ -146,7 +169,13 @@ class MetadataTableList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table bordered rowKey='currentTableId' onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading}>
+          <Table
+            bordered
+            rowSelection={rowSelection}
+            rowKey='currentTableId'
+            onChange={this.handleTableChange}
+            dataSource={this.state.data}
+            loading={this.state.loading}>
             <Column
               title='数据表名称'
               dataIndex='tableName'
@@ -244,6 +273,8 @@ class MetadataTableList extends PureComponent {
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
                 filters={filters}
+                filteredValue={filteredInfo.compareToCurrent}
+                onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
                 render={(text, record) => (
                   <>
                     <Tag color={this.renderColor(text)}>{record.compareToCurrentTxt}</Tag>
