@@ -3,7 +3,6 @@ import PropTypes from 'prop-types'
 // import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
 import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
 import utils from 'utils'
-// import { exportExcel } from 'xlsx-oc'
 import Ellipsis from 'components/Ellipsis'
 const { Column, ColumnGroup } = Table
 const { Search } = Input
@@ -17,7 +16,8 @@ class MetadataTableList extends PureComponent {
       // 数据源id
       dataSourceId: null,
       loading: false,
-      filteredInfo: null
+      filteredInfo: null,
+      tableHeight: 600
     }
   }
   componentDidMount () {
@@ -26,6 +26,10 @@ class MetadataTableList extends PureComponent {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
+    console.log('屏幕高度' + window.document.body.clientHeight)
+    let tableHeight = window.document.body.clientHeight - 313
+    console.log('设置的tableHeight' + tableHeight)
+    this.setState({ tableHeight: tableHeight })
   }
   filter = (val) => {
     if (!val) {
@@ -133,9 +137,19 @@ class MetadataTableList extends PureComponent {
   export = () => {
     if (this.selectData.length > 0) {
       console.log(this.selectData)
-      // let _headers = [{ k: 'tableName', v: '表名' }, { k: 'targetComment', v: '目标注释' },
-      //   { k: 'currentComment', v: '当前注释' }, { k: 'compareComment', v: '上一次注释' } ]
-      // exportExcel(_headers, this.selectData)
+      const { params: { databaseId } } = this.props.match
+      const tableIds = this.selectData.map(item => item.currentTableId).join(',')
+      utils.loading.show()
+      window._http.post('/metadata/sqoop/exportTables', { dataSourceId: databaseId, tableIds }).then(res => {
+        utils.loading.hide()
+        if (res.data.code === 0) {
+          window._message.success(res.data.msg)
+        } else {
+          window._message.error(res.data.msg)
+        }
+      }).catch(res => {
+        utils.loading.hide()
+      })
     } else {
       window._message.error('请选择需要导出的表')
     }
@@ -159,7 +173,7 @@ class MetadataTableList extends PureComponent {
       <div className='MetadataSearch'>
         <Card title='数据表'>
           <div className='clearfix' style={{ marginBottom: 12 }}>
-            <Button type='primary' onClick={this.export}>
+            <Button type='primary' icon='export' onClick={this.export}>
               导出
             </Button>
             <Search
@@ -171,7 +185,11 @@ class MetadataTableList extends PureComponent {
           </div>
           <Table
             bordered
+            ref='table'
             rowSelection={rowSelection}
+            pagination={false}
+            className='smallSizeTable'
+            scroll={{ y: this.state.tableHeight }}
             rowKey='currentTableId'
             onChange={this.handleTableChange}
             dataSource={this.state.data}

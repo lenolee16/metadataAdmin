@@ -52,6 +52,10 @@ class MetadataList extends PureComponent {
       utils.loading.hide()
     })
   }
+  // 导出数据源
+  export = (data) => {
+    console.log('我现在导出')
+  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -116,7 +120,8 @@ class MetadataList extends PureComponent {
               render={(text, record) => (
                   <>
                     <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
-                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)} style={{ marginRight: '10px' }} >同步</Button>
+                    <Button type='danger' ghost icon='export' onClick={() => this.export(record)}>导出</Button>
                   </>
               )}
             />
