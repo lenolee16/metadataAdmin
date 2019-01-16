@@ -57,7 +57,7 @@ class MetadataList extends PureComponent {
     console.log(data.dataSourceId)
     console.log('我现在导出')
     utils.loading.show()
-    window._http.post('/metadata/sqoop/exportDB', { }).then(res => {
+    window._http.post('/metadata/sqoop/exportDB', { dataSourceId: data.dataSourceId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success(res.data.msg)
