@@ -55,6 +55,17 @@ class MetadataList extends PureComponent {
   // 导出数据源
   export = (data) => {
     console.log('我现在导出')
+    utils.loading.show()
+    window._http.post('/metadata/sqoop/exportDB', { }).then(res => {
+      utils.loading.hide()
+      if (res.data.code === 0) {
+        window._message.success(res.data.msg)
+      } else {
+        window._message.error(res.data.msg)
+      }
+    }).catch(res => {
+      utils.loading.hide()
+    })
   }
   render () {
     return (
