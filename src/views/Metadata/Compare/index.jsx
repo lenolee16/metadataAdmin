@@ -60,6 +60,8 @@ class MetadataList extends PureComponent {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success(res.data.msg)
+        // window.location.href = 'https:www.baidu.com'
+        window.open('about:blank').location.href = 'https:www.baidu.com'
       } else {
         window._message.error(res.data.msg)
       }

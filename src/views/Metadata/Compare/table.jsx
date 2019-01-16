@@ -29,7 +29,7 @@ class MetadataTableList extends PureComponent {
     console.log('屏幕高度' + window.document.body.clientHeight)
     let tableHeight = window.document.body.clientHeight - 313
     console.log('设置的tableHeight' + tableHeight)
-    this.setState({ tableHeight: tableHeight })
+    this.setState({ tableHeight })
   }
   filter = (val) => {
     if (!val) {
@@ -144,6 +144,8 @@ class MetadataTableList extends PureComponent {
         utils.loading.hide()
         if (res.data.code === 0) {
           window._message.success(res.data.msg)
+          // window.location.href = 'https:www.baidu.com'
+          window.open('about:blank').location.href = 'https:www.baidu.com'
         } else {
           window._message.error(res.data.msg)
         }
