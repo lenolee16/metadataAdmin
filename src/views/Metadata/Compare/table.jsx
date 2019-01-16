@@ -138,7 +138,7 @@ class MetadataTableList extends PureComponent {
     if (this.selectData.length > 0) {
       console.log(this.selectData)
       const { params: { databaseId } } = this.props.match
-      const tableIds = this.selectData.map(item => item.currentTableId).join(',')
+      const tableIds = this.selectData.map(item => item.targetTable.targetTableId).join(',')
       utils.loading.show()
       window._http.post('/metadata/sqoop/exportTables', { dataSourceId: databaseId, tableIds }).then(res => {
         utils.loading.hide()
