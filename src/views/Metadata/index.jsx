@@ -124,6 +124,11 @@ class Metadata extends PureComponent {
               key='title'
             />
             <Column
+              title='库名'
+              dataIndex='dbName'
+              key='dbName'
+            />
+            <Column
               title='描述'
               dataIndex='description'
               key='des'
@@ -208,11 +213,11 @@ class AddMetadata extends PureComponent {
   setData (data) {
     data.status = !!data.status
     data.dbType = '' + data.dbType
-    const { dataSourceId, title, description, dbType, jdbcUrl, password, status, user } = data
+    const { dataSourceId, title, dbName, description, dbType, jdbcUrl, password, status, user } = data
     if (this.props.formDataId === null) {
-      this.props.form.setFieldsValue({ title, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ title, dbName, description, dbType, jdbcUrl, password, status, user })
     } else {
-      this.props.form.setFieldsValue({ dataSourceId, title, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ dataSourceId, dbName, title, description, dbType, jdbcUrl, password, status, user })
     }
   }
   render () {
@@ -234,6 +239,16 @@ class AddMetadata extends PureComponent {
           {...formItemSettings}
         >
           {getFieldDecorator('title', {
+            rules: [{ required: true, message: '请输入标题' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='库名'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('dbName', {
             rules: [{ required: true, message: '请输入标题' }]
           })(
             <Input />

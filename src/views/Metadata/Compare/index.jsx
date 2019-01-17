@@ -86,6 +86,11 @@ class MetadataList extends PureComponent {
               key='title'
             />
             <Column
+              title='库名'
+              dataIndex='dbName'
+              key='dbName'
+            />
+            <Column
               title='描述'
               dataIndex='description'
               key='description'
