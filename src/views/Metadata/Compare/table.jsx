@@ -199,52 +199,25 @@ class MetadataTableList extends PureComponent {
               title='数据表名称'
               dataIndex='tableName'
               key='tableName'
+              width={180}
             />
             <ColumnGroup title='目标版本' >
-              {/* <Column
-                title='目标版本号'
-                dataIndex='targetVersionNo'
-                key='targetVersionNo'
-                render={(text, values) => (
-                  <>
-                    {
-                      text ? <Popover content={this.renderPopover(values, 'targetComment')} title='详情'>
-                        {values.targetVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
-                      </Popover> : '-'
-                    }
-                  </>
-                )}
-              /> */}
               <Column
                 title='目标注释'
                 dataIndex='targetComment'
                 key='targetComment'
-                width='200px'
+                width={200}
                 render={(text) => (
                   <Ellipsis content={text} style={{ width: 150 }} />
                 )}
               />
             </ColumnGroup>
             <ColumnGroup title='当前快照与目标版本对比' >
-              {/* <Column
-                title='当前版本号'
-                dataIndex='currentVersionNo'
-                key='currentVersionNo'
-                render={(text, values) => (
-                  <>
-                    {
-                      text ? <Popover content={this.renderPopover(values, 'currentComment')} title='详情'>
-                        {values.currentVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
-                      </Popover> : '-'
-                    }
-                  </>
-                )}
-              /> */}
               <Column
                 title='当前注释'
                 dataIndex='currentComment'
                 key='currentComment'
-                width='200px'
+                width={200}
                 render={(text) => (
                   <Ellipsis content={text} style={{ width: 150 }} />
                 )}
@@ -253,6 +226,7 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
+                width={180}
                 filters={filters}
                 filteredValue={filteredInfo.currentToTarget}
                 onFilter={(value, record) => value.includes(`${record.currentToTarget}`)}
@@ -264,20 +238,6 @@ class MetadataTableList extends PureComponent {
               />
             </ColumnGroup>
             <ColumnGroup title='上一次快照与当前快照对比'>
-              {/* <Column
-                title='上一次版本号'
-                dataIndex='compareVersionNo'
-                key='compareVersionNo'
-                render={(text, values) => (
-                  <>
-                    {
-                      text ? <Popover content={this.renderPopover(values, 'compareComment')} title='详情'>
-                        {values.compareVersionNo}<Icon type='exclamation-circle' style={{ marginLeft: '5px', color: '#1890ff' }} />
-                      </Popover> : '-'
-                    }
-                  </>
-                )}
-              /> */}
               <Column
                 title='上一次注释'
                 dataIndex='compareComment'
@@ -291,6 +251,7 @@ class MetadataTableList extends PureComponent {
                 title='状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
+                width={180}
                 filters={filters}
                 filteredValue={filteredInfo.compareToCurrent}
                 onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
@@ -304,7 +265,6 @@ class MetadataTableList extends PureComponent {
             <Column
               title='操作'
               key='action'
-              width='200'
               render={(text, record) => (
                   <>
                     <Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
