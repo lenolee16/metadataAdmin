@@ -1,7 +1,7 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 // import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
-import { Card, Table, Button, Input, Form, Modal, Tag, Switch } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Radio, InputNumber } from 'antd'
 import utils from 'utils'
 import Ellipsis from 'components/Ellipsis'
 const { Column, ColumnGroup } = Table
@@ -26,9 +26,7 @@ class MetadataTableList extends PureComponent {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
-    console.log('屏幕高度' + window.document.body.clientHeight)
     let tableHeight = window.document.body.clientHeight - 313
-    console.log('设置的tableHeight' + tableHeight)
     this.setState({ tableHeight })
   }
   filter = (val) => {
@@ -44,7 +42,11 @@ class MetadataTableList extends PureComponent {
     window._http.post('/metadata/targetTable/compareTable', { sourceDatabaseId: databaseId }).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.data = res.data.data.dataList
+        this.data = res.data.data.dataList.map(v => {
+          v.targetTable.splitFlag = 0
+          v.targetTable.splitNum = 1
+          return v
+        })
         this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg)
@@ -201,14 +203,21 @@ class MetadataTableList extends PureComponent {
               key='tableName'
               width={180}
             />
+            <Column
+              title='分库分表'
+              dataIndex='splitFlag'
+              key='splitFlag'
+              width={90}
+              render={(text, record) => (record.targetTable.splitFlag ? '是（' + record.targetTable.splitNum + '）' : '否（' + record.targetTable.splitNum + '）')}
+            />
             <ColumnGroup title='目标版本' >
               <Column
                 title='目标注释'
                 dataIndex='targetComment'
                 key='targetComment'
-                width={200}
+                width={150}
                 render={(text) => (
-                  <Ellipsis content={text} style={{ width: 150 }} />
+                  <Ellipsis content={text} style={{ width: 110 }} />
                 )}
               />
             </ColumnGroup>
@@ -217,16 +226,16 @@ class MetadataTableList extends PureComponent {
                 title='当前注释'
                 dataIndex='currentComment'
                 key='currentComment'
-                width={200}
+                width={150}
                 render={(text) => (
-                  <Ellipsis content={text} style={{ width: 150 }} />
+                  <Ellipsis content={text} style={{ width: 110 }} />
                 )}
               />
               <Column
                 title='状态'
                 dataIndex='currentToTarget'
                 key='currentToTarget'
-                width={180}
+                width={150}
                 filters={filters}
                 filteredValue={filteredInfo.currentToTarget}
                 onFilter={(value, record) => value.includes(`${record.currentToTarget}`)}
@@ -242,16 +251,16 @@ class MetadataTableList extends PureComponent {
                 title='上一次注释'
                 dataIndex='compareComment'
                 key='compareComment'
-                width={200}
+                width={150}
                 render={(text) => (
-                  <Ellipsis content={text} style={{ width: 150 }} />
+                  <Ellipsis content={text} style={{ width: 110 }} />
                 )}
               />
               <Column
                 title='状态'
                 dataIndex='compareToCurrent'
                 key='compareToCurrent'
-                width={180}
+                width={150}
                 filters={filters}
                 filteredValue={filteredInfo.compareToCurrent}
                 onFilter={(value, record) => value.includes(`${record.compareToCurrent}`)}
@@ -298,6 +307,10 @@ const formItemSettings = {
 }
 
 class AddMetadata extends Component {
+  constructor (props) {
+    super(props)
+    this.splitFlag = 0
+  }
   handleSubmit = (e) => {
     e.preventDefault()
     this.props.form.validateFields((err, values) => {
@@ -309,9 +322,15 @@ class AddMetadata extends Component {
   }
   setData (data) {
     data.status = !!data.status
-    const { targetTableId, status } = data
+    const { targetTableId, status, splitFlag, splitNum } = data
     const targetTableComment = data.targetComment || ''
-    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status })
+    this.splitFlag = splitFlag
+    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status, splitFlag, splitNum })
+  }
+  radioFunc (e) {
+    console.log(e.target)
+    this.splitFlag = e.target.value
+    console.log(this.splitFlag)
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -334,6 +353,32 @@ class AddMetadata extends Component {
           })(
             // <Input />
             <textarea style={{ width: '100%' }} />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='是否分库分表'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('splitFlag', {
+            initialValue: 0
+          })(
+            <Radio.Group onChange={e => this.radioFunc(e)}>
+              <Radio value={1}>是</Radio>
+              <Radio value={0}>否</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
+        <Form.Item
+          label='库数'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('splitNum', {
+            initialValue: 1,
+            rules: [{ required: true,
+              pattern: new RegExp(/^[1-9]\d*$/, 'g'),
+              message: '请输入库数且为整数' }]
+          })(
+            <InputNumber min={1 + this.splitFlag} max={this.splitFlag ? 1000 : 1} disabled={!this.splitFlag} />
           )}
         </Form.Item>
         <Form.Item
