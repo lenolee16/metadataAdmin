@@ -204,7 +204,7 @@ class MetadataTableList extends PureComponent {
               width={180}
             />
             <Column
-              title='分库分表'
+              title='分库分表（数量）'
               dataIndex='splitFlag'
               key='splitFlag'
               width={90}
@@ -369,14 +369,14 @@ class AddMetadata extends Component {
           )}
         </Form.Item>
         <Form.Item
-          label='库数'
+          label='分库数'
           {...formItemSettings}
         >
           {getFieldDecorator('splitNum', {
             initialValue: 1,
             rules: [{ required: true,
               pattern: new RegExp(/^[1-9]\d*$/, 'g'),
-              message: '请输入库数且为整数' }]
+              message: '请输入分库数且为整数' }]
           })(
             <InputNumber min={1 + this.splitFlag} max={this.splitFlag ? 1000 : 1} disabled={!this.splitFlag} />
           )}
