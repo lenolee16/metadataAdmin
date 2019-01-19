@@ -173,8 +173,8 @@ class Metadata extends PureComponent {
               key='action'
               render={(text, record) => (
                 <>
-                  <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px' }}>修改</Button>
-                  <Button type='primary' ghost icon='copy' onClick={() => this.copy(record)} style={{ marginRight: '10px' }}>复制</Button>
+                  <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '10px', marginBottom: '5px' }}>修改</Button>
+                  <Button type='primary' ghost icon='copy' onClick={() => this.copy(record)} style={{ marginRight: '10px', marginBottom: '5px' }}>复制</Button>
                   <Button type='primary' ghost icon='file-sync' style={{ color: '#4eca6a', borderColor: '#4eca6a' }} onClick={() => this.testFnc(record)}>测试</Button>
                 </>
               )}

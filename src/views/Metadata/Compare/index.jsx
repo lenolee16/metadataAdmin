@@ -135,8 +135,8 @@ class MetadataList extends PureComponent {
               key='action'
               render={(text, record) => (
                   <>
-                    <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px' }} >查看</Button></Link>
-                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)} style={{ marginRight: '10px' }} >同步</Button>
+                    <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' ghost icon='search' style={{ marginRight: '10px', marginBottom: '5px' }} >查看</Button></Link>
+                    <Button type='danger' ghost icon='sync' onClick={() => this.sync(record)} style={{ marginRight: '10px', marginBottom: '5px' }} >同步</Button>
                     <Button type='primary' ghost icon='export' onClick={() => this.export(record)}>导出</Button>
                   </>
               )}
