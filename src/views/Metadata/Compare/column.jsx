@@ -144,19 +144,18 @@ class MetadataColumnList extends PureComponent {
                 dataIndex='targetField.targetFieldComment'
                 key='targetField.targetFieldComment'
                 width={150}
-                render={(text) => (
-                  <Ellipsis content={text} style={{ width: 100 }} />
+                render={(text, record) => (
+                  record.targetField ? <Ellipsis content={record.targetField.targetFieldComment} style={{ width: 100 }} /> : '-'
+
                 )}
               />
               <Column
-                title='类型（长度）'
+                title='类型（长度,小数位）'
                 dataIndex='targetField'
                 key='targetField.targetFieldType'
                 width={150}
-                render={(text) => (
-                  <>
-                    {text.targetFieldType}({text.targetFieldSize})
-                  </>
+                render={(text, record) => (
+                  record.targetField ? record.targetField.targetFieldType + '(' + record.targetField.targetFieldSize + ',' + record.targetField.targetDecimalDigits + ')' : '-'
                 )}
               />
               <Column
@@ -164,10 +163,8 @@ class MetadataColumnList extends PureComponent {
                 dataIndex='targetField.targetFieldPri'
                 key='targetField.targetFieldPri'
                 width={90}
-                render={(text) => (
-                  <span>
-                    {text ? '是' : '否'}
-                  </span>
+                render={(text, record) => (
+                  record.targetField ? record.targetField.targetFieldPri ? '是' : '否' : '-'
                 )}
               />
               <Column
@@ -285,9 +282,9 @@ class AddMetadata extends Component {
     })
   }
   setForm = (data) => {
-    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDefaultValue, status } = data
+    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status } = data
     this.props.form.setFieldsValue({
-      targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDefaultValue, status: !!status
+      targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status: !!status
     })
   }
   render () {
@@ -343,6 +340,16 @@ class AddMetadata extends Component {
         >
           {getFieldDecorator('targetFieldSize', {
             rules: [{ required: true, message: '请输入字段长度' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='字段小数位'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetDecimalDigits', {
+            rules: [{ required: true, message: '请输入字段小数位' }]
           })(
             <Input />
           )}
