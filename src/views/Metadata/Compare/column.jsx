@@ -100,8 +100,10 @@ class MetadataColumnList extends PureComponent {
       <div className='Popover'>
         <p>字段类型：{data.targetFieldType}</p>
         <p>是否主键：{data.targetFieldPri ? '是' : '否'}</p>
+        <p>值是否为空：{data.targetFieldNullable ? '是' : '否'}</p>
         <p>字段注释：{data.targetFieldComment}</p>
         <p>字段长度：{data.targetFieldSize}</p>
+        <p>字段小数位：{data.targetDecimalDigits}</p>
         <p>默认值：{data.targetDefaultValue}</p>
       </div>
     )
@@ -282,9 +284,9 @@ class AddMetadata extends Component {
     })
   }
   setForm = (data) => {
-    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status } = data
+    const { targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status, targetFieldNullable } = data
     this.props.form.setFieldsValue({
-      targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status: !!status
+      targetFieldName, targetFieldType, targetFieldComment, targetFieldPri, targetFieldSize, targetDecimalDigits, targetDefaultValue, status: !!status, targetFieldNullable
     })
   }
   render () {
@@ -316,6 +318,19 @@ class AddMetadata extends Component {
           {...formItemSettings}
         >
           {getFieldDecorator('targetFieldPri', {
+            initialValue: 0
+          })(
+            <Radio.Group>
+              <Radio value={1}>是</Radio>
+              <Radio value={0}>否</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
+        <Form.Item
+          label='值是否为空'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('targetFieldNullable', {
             initialValue: 0
           })(
             <Radio.Group>
