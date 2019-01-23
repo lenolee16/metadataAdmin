@@ -122,7 +122,6 @@ class MetadataList extends PureComponent {
               dataIndex='dbType'
               key='dbType'
               width={100}
-              align='center'
               render={(v) => {
                 if (v === 1) {
                   return 'mysql'
