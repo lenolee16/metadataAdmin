@@ -201,7 +201,10 @@ class MetadataTableList extends PureComponent {
               title='数据表名称'
               dataIndex='tableName'
               key='tableName'
-              width={180}
+              width={110}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 75 }} />
+              )}
             />
             <Column
               title='分库分表（数量）'

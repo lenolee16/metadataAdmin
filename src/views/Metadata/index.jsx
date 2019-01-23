@@ -2,6 +2,7 @@ import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Table, Button, Input, Modal, Form, Select, Switch } from 'antd'
 import utils from 'utils'
+import Ellipsis from 'components/Ellipsis'
 
 const { Column } = Table
 const { Search } = Input
@@ -13,11 +14,14 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
-      formDataId: null
+      formDataId: null,
+      tableHeight: 600
     }
   }
   componentDidMount () {
     this.initData()
+    let tableHeight = window.document.body.clientHeight - 263
+    this.setState({ tableHeight })
   }
   filter = (val) => {
     if (!val) {
@@ -117,26 +121,46 @@ class Metadata extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='dataSourceId' dataSource={this.state.data} loading={this.state.loading}>
+          <Table
+            rowKey='dataSourceId'
+            pagination={false}
+            className='smallSizeTable'
+            scroll={{ y: this.state.tableHeight }}
+            dataSource={this.state.data}
+            loading={this.state.loading}>
             <Column
               title='标题'
               dataIndex='title'
               key='title'
+              width={125}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 90 }} />
+              )}
             />
             <Column
               title='库名'
               dataIndex='dbName'
               key='dbName'
+              width={145}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 110 }} />
+              )}
             />
             <Column
               title='描述'
               dataIndex='description'
-              key='des'
+              key='description'
+              width={145}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 110 }} />
+              )}
             />
             <Column
               title='数据库类型'
               dataIndex='dbType'
-              key='type'
+              key='dbType'
+              width={100}
+              align='center'
               render={(v) => {
                 if (v === 1) {
                   return 'mysql'
@@ -149,23 +173,34 @@ class Metadata extends PureComponent {
               title='链接地址'
               dataIndex='jdbcUrl'
               key='jdbcUrl'
-              width='150px'
+              width={145}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 110 }} />
+              )}
             />
             <Column
               title='用户名'
               dataIndex='user'
               key='user'
+              width={145}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 110 }} />
+              )}
             />
             <Column
               title='密码'
               dataIndex='password'
               key='password'
+              align='center'
+              width={60}
               render={() => '*****'}
             />
             <Column
               title='状态'
               dataIndex='status'
               key='status'
+              align='center'
+              width={60}
               render={(v) => v ? '启用' : '禁用'}
             />
             <Column
