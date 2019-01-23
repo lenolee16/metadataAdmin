@@ -147,6 +147,15 @@ class Metadata extends PureComponent {
               )}
             />
             <Column
+              title='hive库名'
+              dataIndex='hiveDbName'
+              key='hiveDbName'
+              width={145}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 110 }} />
+              )}
+            />
+            <Column
               title='描述'
               dataIndex='description'
               key='description'
@@ -247,11 +256,11 @@ class AddMetadata extends PureComponent {
   setData (data) {
     data.status = !!data.status
     data.dbType = '' + data.dbType
-    const { dataSourceId, title, dbName, description, dbType, jdbcUrl, password, status, user } = data
+    const { dataSourceId, title, dbName, hiveDbName, description, dbType, jdbcUrl, password, status, user } = data
     if (this.props.formDataId === null) {
-      this.props.form.setFieldsValue({ title, dbName, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ title, dbName, hiveDbName, description, dbType, jdbcUrl, password, status, user })
     } else {
-      this.props.form.setFieldsValue({ dataSourceId, dbName, title, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ dataSourceId, dbName, hiveDbName, title, description, dbType, jdbcUrl, password, status, user })
     }
   }
   render () {
@@ -283,7 +292,17 @@ class AddMetadata extends PureComponent {
           {...formItemSettings}
         >
           {getFieldDecorator('dbName', {
-            rules: [{ required: true, message: '请输入标题' }]
+            rules: [{ required: true, message: '请输入库名' }]
+          })(
+            <Input />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='hive库名'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('hiveDbName', {
+            rules: [{ required: false, message: '请输入hive库名' }]
           })(
             <Input />
           )}

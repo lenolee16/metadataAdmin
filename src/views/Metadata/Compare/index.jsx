@@ -103,9 +103,18 @@ class MetadataList extends PureComponent {
               title='库名'
               dataIndex='dbName'
               key='dbName'
-              width={145}
+              width={120}
               render={(text) => (
-                <Ellipsis content={text} style={{ width: 110 }} />
+                <Ellipsis content={text} style={{ width: 85 }} />
+              )}
+            />
+            <Column
+              title='hive库名'
+              dataIndex='hiveDbName'
+              key='hiveDbName'
+              width={120}
+              render={(text) => (
+                <Ellipsis content={text} style={{ width: 85 }} />
               )}
             />
             <Column
