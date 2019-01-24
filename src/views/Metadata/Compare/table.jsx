@@ -280,9 +280,9 @@ class MetadataTableList extends PureComponent {
               key='action'
               render={(text, record) => (
                   <>
-                    <Button type='primary' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
-                    <Button type='primary' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
-                    <Button type='danger' disabled={record.currentToTarget === 0} ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
+                    <Button type='primary' size='small' ghost icon='search' style={{ marginRight: '5px', marginBottom: '5px' }} onClick={() => this.examine(record)} >查看</Button>
+                    <Button type='primary' size='small' ghost icon='edit' onClick={() => this.amend(record)} style={{ marginRight: '5px', marginBottom: '5px' }}>修改</Button>
+                    <Button type='danger' size='small' disabled={record.currentToTarget === 0} ghost icon='sync' onClick={() => this.sync(record)}>同步</Button>
                   </>
               )}
             />
