@@ -15,7 +15,8 @@ class MetadataColumnList extends PureComponent {
       visible: false,
       formDataId: null,
       loading: false,
-      filteredInfo: null
+      filteredInfo: null,
+      tableHeight: 500
     }
   }
   filter = (val) => {
@@ -26,6 +27,17 @@ class MetadataColumnList extends PureComponent {
   }
   componentDidMount () {
     this.queryData()
+    window.addEventListener('resize', this.handleResize.bind(this))
+    let tableHeight = window.document.body.clientHeight - 313
+    this.setState({ tableHeight })
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.handleResize.bind(this))
+  }
+  // 浏览器窗口大小改变事件
+  handleResize = e => {
+    let tableHeight = e.target.innerHeight - 313
+    this.setState({ tableHeight })
   }
   queryData () {
     const { params: { databaseId, id } } = this.props.match
@@ -130,14 +142,14 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: 500 }} >
+          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: this.state.tableHeight }} >
             <Column
               title='字段名称'
               dataIndex='targetFieldName'
               key='targetFieldName'
-              width={150}
+              width={220}
               render={(text) => (
-                <b>{text}</b>
+                <Ellipsis content={text} style={{ width: 185 }} />
               )}
             />
             <ColumnGroup title='目标'>

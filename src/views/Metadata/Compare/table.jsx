@@ -26,7 +26,16 @@ class MetadataTableList extends PureComponent {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
+    window.addEventListener('resize', this.handleResize.bind(this))
     let tableHeight = window.document.body.clientHeight - 313
+    this.setState({ tableHeight })
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.handleResize.bind(this))
+  }
+  // 浏览器窗口大小改变事件
+  handleResize = e => {
+    let tableHeight = e.target.innerHeight - 313
     this.setState({ tableHeight })
   }
   filter = (val) => {
@@ -197,9 +206,9 @@ class MetadataTableList extends PureComponent {
               title='数据表名称'
               dataIndex='tableName'
               key='tableName'
-              width={110}
+              width={220}
               render={(text) => (
-                <Ellipsis content={text} style={{ width: 75 }} />
+                <Ellipsis content={text} style={{ width: 185 }} />
               )}
             />
             <Column

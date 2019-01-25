@@ -20,7 +20,16 @@ class Metadata extends PureComponent {
   }
   componentDidMount () {
     this.initData()
+    window.addEventListener('resize', this.handleResize.bind(this))
     let tableHeight = window.document.body.clientHeight - 263
+    this.setState({ tableHeight })
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.handleResize.bind(this))
+  }
+  // 浏览器窗口大小改变事件
+  handleResize = e => {
+    let tableHeight = e.target.innerHeight - 263
     this.setState({ tableHeight })
   }
   filter = (val) => {
@@ -141,18 +150,18 @@ class Metadata extends PureComponent {
               title='库名'
               dataIndex='dbName'
               key='dbName'
-              width={120}
+              width={145}
               render={(text) => (
-                <Ellipsis content={text} style={{ width: 85 }} />
+                <Ellipsis content={text} style={{ width: 110 }} />
               )}
             />
             <Column
               title='hive库名'
               dataIndex='hiveDbName'
               key='hiveDbName'
-              width={120}
+              width={145}
               render={(text) => (
-                <Ellipsis content={text} style={{ width: 85 }} />
+                <Ellipsis content={text} style={{ width: 110 }} />
               )}
             />
             <Column
