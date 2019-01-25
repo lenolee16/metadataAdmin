@@ -42,11 +42,7 @@ class MetadataTableList extends PureComponent {
     window._http.post('/metadata/targetTable/compareTable', { sourceDatabaseId: databaseId }).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
-        this.data = res.data.data.dataList.map(v => {
-          v.targetTable.splitFlag = 0
-          v.targetTable.splitNum = 1
-          return v
-        })
+        this.data = res.data.data.dataList
         this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg)
