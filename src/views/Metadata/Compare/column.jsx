@@ -28,7 +28,7 @@ class MetadataColumnList extends PureComponent {
   componentDidMount () {
     this.queryData()
     window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 313
+    let tableHeight = window.document.body.clientHeight - 273
     this.setState({ tableHeight })
   }
   componentWillUnmount () {

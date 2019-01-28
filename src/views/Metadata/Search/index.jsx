@@ -13,17 +13,19 @@ class MetadataSearch extends PureComponent {
       data: [],
       tableName: '',
       fieldName: '',
+      tableComment: '',
+      fieldComment: '',
       loading: false,
       isSearched: false
     }
   }
   search = () => {
-    const { tableName, fieldName } = this.state
-    if (!tableName && !fieldName) {
+    const { tableName, fieldName, tableComment, fieldComment } = this.state
+    if (!tableName && !fieldName && !fieldComment && !tableComment) {
       return window._message.error('请输入至少一项搜索条件')
     }
     this.setState({ loading: true })
-    window._http.post('/metadata/targetField/searchField', { tableName, fieldName }).then(res => {
+    window._http.post('/metadata/targetField/searchField', { tableName, fieldName, tableComment, fieldComment }).then(res => {
       if (res.data.code === 0) {
         this.setState({
           data: res.data.data,
@@ -32,6 +34,7 @@ class MetadataSearch extends PureComponent {
         })
       } else {
         this.setState({ loading: false })
+        window._message.error(res.data.msg || '查询失败')
       }
     }).catch(res => {
       this.setState({ loading: false })
@@ -43,7 +46,9 @@ class MetadataSearch extends PureComponent {
         <Card title='数据源搜索'>
           <div className='searchForm'>
             <Input addonBefore='表名' size='large' value={this.state.tableName} onChange={(e) => this.setState({ tableName: e.target.value })} placeholder='请输入数据表名' />
+            <Input addonBefore='表注释' size='large' value={this.state.tableComment} onChange={(e) => this.setState({ tableComment: e.target.value })} placeholder='请输入数据表注释' />
             <Input addonBefore='字段名' size='large' value={this.state.fieldName} onChange={(e) => this.setState({ fieldName: e.target.value })} placeholder='请输入字段名' />
+            <Input addonBefore='字段注释' size='large' value={this.state.fieldComment} onChange={(e) => this.setState({ fieldComment: e.target.value })} placeholder='请输入字段注释' />
             <Button type='primary' size='large' icon='search' onClick={this.search} loading={this.state.loading}>搜索</Button>
           </div>
           {this.state.isSearched ? <div className='searchResult'>
@@ -59,9 +64,19 @@ class MetadataSearch extends PureComponent {
                 key='targetTableName'
               />
               <Column
+                title='数据表注释'
+                dataIndex='targetTableComment'
+                key='targetTableComment'
+              />
+              <Column
                 title='数据字段名'
                 dataIndex='targetFieldName'
                 key='targetFieldName'
+              />
+              <Column
+                title='数据字段注释'
+                dataIndex='targetFieldComment'
+                key='targetFieldComment'
               />
               <Column
                 title='操作'

@@ -27,7 +27,7 @@ class MetadataTableList extends PureComponent {
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
     window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 313
+    let tableHeight = window.document.body.clientHeight - 273
     this.setState({ tableHeight })
   }
   componentWillUnmount () {

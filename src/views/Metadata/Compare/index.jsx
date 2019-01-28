@@ -26,7 +26,7 @@ class MetadataList extends PureComponent {
   }
   // 浏览器窗口大小改变事件
   handleResize = e => {
-    let tableHeight = e.target.innerHeight - 263
+    let tableHeight = e.target.innerHeight - 223
     this.setState({ tableHeight })
   }
   filter = (val) => {
