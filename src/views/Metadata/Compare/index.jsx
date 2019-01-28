@@ -152,9 +152,9 @@ class MetadataList extends PureComponent {
               title='IP端口'
               dataIndex='jdbcUrl'
               key='jdbcUrl'
-              width={145}
+              width={150}
               render={(text) => (
-                <Ellipsis content={text.split('//')[1].split('/')[0]} style={{ width: 110 }} />
+                text.split('//')[1] ? text.split('//')[1].split(/[/|;]/)[0] : ''
               )}
             />
             <Column
