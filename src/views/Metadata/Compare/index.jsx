@@ -149,12 +149,12 @@ class MetadataList extends PureComponent {
               }}
             />
             <Column
-              title='链接地址'
+              title='IP端口'
               dataIndex='jdbcUrl'
               key='jdbcUrl'
               width={145}
               render={(text) => (
-                <Ellipsis content={text} style={{ width: 110 }} />
+                <Ellipsis content={text.split('//')[1].split('/')[0]} style={{ width: 110 }} />
               )}
             />
             <Column
@@ -165,14 +165,6 @@ class MetadataList extends PureComponent {
               render={(text) => (
                 <Ellipsis content={text} style={{ width: 110 }} />
               )}
-            />
-            <Column
-              title='密码'
-              dataIndex='password'
-              key='password'
-              align='center'
-              width={60}
-              render={() => '*****'}
             />
             <Column
               title='状态'
