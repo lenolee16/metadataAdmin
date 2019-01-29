@@ -217,7 +217,9 @@ class MetadataTableList extends PureComponent {
               key='splitFlag'
               align='center'
               width={90}
-              render={(text, record) => (record.targetTable.splitFlag ? '是（' + record.targetTable.splitNum + '）' : '否')}
+              render={
+                (text, record) => (record.targetTable ? (record.targetTable.splitFlag ? '是（' + record.targetTable.splitNum + '）' : '否') : '-')
+              }
             />
             <ColumnGroup title='目标版本' >
               <Column

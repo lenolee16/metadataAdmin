@@ -45,10 +45,10 @@ class MetadataSearch extends PureComponent {
       <div className='MetadataSearch'>
         <Card title='数据源搜索'>
           <div className='searchForm'>
-            <Input addonBefore='表名' size='large' value={this.state.tableName} onChange={(e) => this.setState({ tableName: e.target.value })} placeholder='请输入数据表名' />
-            <Input addonBefore='表注释' size='large' value={this.state.tableComment} onChange={(e) => this.setState({ tableComment: e.target.value })} placeholder='请输入数据表注释' />
-            <Input addonBefore='字段名' size='large' value={this.state.fieldName} onChange={(e) => this.setState({ fieldName: e.target.value })} placeholder='请输入字段名' />
-            <Input addonBefore='字段注释' size='large' value={this.state.fieldComment} onChange={(e) => this.setState({ fieldComment: e.target.value })} placeholder='请输入字段注释' />
+            <Input addonBefore='表名' size='large' value={this.state.tableName} onPressEnter={this.search} onChange={(e) => this.setState({ tableName: e.target.value })} placeholder='请输入数据表名' />
+            <Input addonBefore='表注释' size='large' value={this.state.tableComment} onPressEnter={this.search} onChange={(e) => this.setState({ tableComment: e.target.value })} placeholder='请输入数据表注释' />
+            <Input addonBefore='字段名' size='large' value={this.state.fieldName} onPressEnter={this.search} onChange={(e) => this.setState({ fieldName: e.target.value })} placeholder='请输入字段名' />
+            <Input addonBefore='字段注释' size='large' value={this.state.fieldComment} onPressEnter={this.search} onChange={(e) => this.setState({ fieldComment: e.target.value })} placeholder='请输入字段注释' />
             <Button type='primary' size='large' icon='search' onClick={this.search} loading={this.state.loading}>搜索</Button>
           </div>
           {this.state.isSearched ? <div className='searchResult'>
