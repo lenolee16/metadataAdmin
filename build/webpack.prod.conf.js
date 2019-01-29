@@ -21,7 +21,8 @@ let webpackConfig = merge(baseWebpackConfig, {
     output: {
         path: config.build.assetsRoot,
         filename: utils.assetsPath('js/[name].[chunkhash].js'),
-        chunkFilename: utils.assetsPath('js/[name].[chunkhash].js')
+        chunkFilename: utils.assetsPath('js/[name].[chunkhash].js'),
+        publicPath: '/metadata_ui/'
     },
     optimization: {
         // split vendor js into its own file
