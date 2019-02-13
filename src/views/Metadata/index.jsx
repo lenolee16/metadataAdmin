@@ -7,6 +7,7 @@ import Ellipsis from 'components/Ellipsis'
 
 const { Column } = Table
 const { Search } = Input
+
 const mapStateToProps = state => ({
   tableHeightNum: state.tableHeight.tableHeightNum
 })
@@ -18,8 +19,7 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
-      formDataId: null,
-      tableHeight: 600
+      formDataId: null
     }
   }
   componentDidMount () {
@@ -27,18 +27,18 @@ class Metadata extends PureComponent {
     setTimeout(() => {
       console.log(this.props.tableHeightNum)
     }, 0)
-    window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 263
-    this.setState({ tableHeight })
+    // window.addEventListener('resize', this.handleResize.bind(this))
+    // let tableHeight = window.document.body.clientHeight - 263
+    // this.setState({ tableHeight })
   }
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.handleResize.bind(this))
-  }
-  // 浏览器窗口大小改变事件
-  handleResize = e => {
-    let tableHeight = e.target.innerHeight - 223
-    this.setState({ tableHeight })
-  }
+  // componentWillUnmount () {
+  //   window.removeEventListener('resize', this.handleResize.bind(this))
+  // }
+  // // 浏览器窗口大小改变事件
+  // handleResize = e => {
+  //   let tableHeight = e.target.innerHeight - 223
+  //   this.setState({ tableHeight })
+  // }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
@@ -141,7 +141,7 @@ class Metadata extends PureComponent {
             rowKey='dataSourceId'
             pagination={false}
             className='smallSizeTable'
-            scroll={{ y: this.state.tableHeight }}
+            scroll={{ y: this.props.tableHeightNum - 270 }}
             dataSource={this.state.data}
             loading={this.state.loading}>
             <Column
@@ -245,9 +245,11 @@ class Metadata extends PureComponent {
     )
   }
 }
+
 Metadata.propTypes = {
   tableHeightNum: PropTypes.number
 }
+
 const formItemSettings = {
   labelCol: { span: 5 },
   wrapperCol: { span: 12 }
@@ -401,7 +403,6 @@ AddMetadata.propTypes = {
 
 const WrappedForm = Form.create()(AddMetadata)
 
-// export default Metadata
 export default connect(
   mapStateToProps
 )(Metadata)

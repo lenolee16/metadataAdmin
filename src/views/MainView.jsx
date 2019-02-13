@@ -13,8 +13,7 @@ import './MainView.less'
 const { Sider, Content, Header } = Layout
 
 const mapStateToProps = state => ({
-  loading: state.loading.globalLoading,
-  tableHeightNum: state.tableHeight.tableHeightNum
+  loading: state.loading.globalLoading
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -31,26 +30,14 @@ class MainView extends React.PureComponent {
   }
   componentDidMount () {
     window.addEventListener('resize', this.handleResize.bind(this))
-    // let tableHeight = window.document.body.clientHeight - 263
-    // console.log(tableHeight)
-    // this.props.tableHeight(window.document.body.clientHeight)
-    // console.log(window.document.body.clientHeight)
-    // console.log(this.props.tableHeightNum)
   }
   componentWillUnmount () {
+    console.log('注销监控屏幕高度')
     window.removeEventListener('resize', this.handleResize.bind(this))
   }
   // 浏览器窗口大小改变事件
   handleResize = e => {
-    console.log('改变开始')
-    // let tableHeight = e.target.innerHeight - 223
-    // console.log(tableHeight)
     this.props.tableHeight(e.target.innerHeight)
-    console.log(e.target.innerHeight)
-    setTimeout(() => {
-      console.log('----')
-      console.log(this.props.tableHeightNum)
-    }, 0)
   }
   render () {
     return (
@@ -77,7 +64,7 @@ class MainView extends React.PureComponent {
 MainView.propTypes = {
   location: PropTypes.object,
   loading: PropTypes.bool,
-  tableHeightNum: PropTypes.number,
+  // tableHeightNum: PropTypes.number,
   tableHeight: PropTypes.func
 }
 

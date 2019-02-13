@@ -2,33 +2,42 @@ import React, { PureComponent } from 'react'
 import { Card, Table, Button, Input } from 'antd'
 import { Link } from 'react-router-dom'
 import utils from 'utils'
+import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import Ellipsis from 'components/Ellipsis'
 const { Column } = Table
 const { Search } = Input
+
+const mapStateToProps = state => ({
+  tableHeightNum: state.tableHeight.tableHeightNum
+})
+
 class MetadataList extends PureComponent {
   constructor (props) {
     super(props)
     this.state = {
       data: [],
       visible: false,
-      loading: false,
-      tableHeight: 600
+      loading: false
     }
   }
   componentDidMount () {
     this.initData()
-    window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 263
-    this.setState({ tableHeight })
+    setTimeout(() => {
+      console.log(this.props.tableHeightNum)
+    }, 0)
+    // window.addEventListener('resize', this.handleResize.bind(this))
+    // let tableHeight = window.document.body.clientHeight - 263
+    // this.setState({ tableHeight })
   }
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.handleResize.bind(this))
-  }
-  // 浏览器窗口大小改变事件
-  handleResize = e => {
-    let tableHeight = e.target.innerHeight - 223
-    this.setState({ tableHeight })
-  }
+  // componentWillUnmount () {
+  //   window.removeEventListener('resize', this.handleResize.bind(this))
+  // }
+  // // 浏览器窗口大小改变事件
+  // handleResize = e => {
+  //   let tableHeight = e.target.innerHeight - 223
+  //   this.setState({ tableHeight })
+  // }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
@@ -96,7 +105,7 @@ class MetadataList extends PureComponent {
             rowKey='dataSourceId'
             pagination={false}
             className='smallSizeTable'
-            scroll={{ y: this.state.tableHeight }}
+            scroll={{ y: this.props.tableHeightNum - 270 }}
             dataSource={this.state.data}
             loading={this.state.loading}>
             <Column
@@ -192,4 +201,10 @@ class MetadataList extends PureComponent {
   }
 }
 
-export default MetadataList
+MetadataList.propTypes = {
+  tableHeightNum: PropTypes.number
+}
+
+export default connect(
+  mapStateToProps
+)(MetadataList)

@@ -1,11 +1,15 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-// import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Popover, Icon } from 'antd'
 import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Radio, InputNumber } from 'antd'
 import utils from 'utils'
+import { connect } from 'react-redux'
 import Ellipsis from 'components/Ellipsis'
 const { Column, ColumnGroup } = Table
 const { Search } = Input
+
+const mapStateToProps = state => ({
+  tableHeightNum: state.tableHeight.tableHeightNum
+})
 
 class MetadataTableList extends PureComponent {
   constructor (props) {
@@ -26,18 +30,21 @@ class MetadataTableList extends PureComponent {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
-    window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 273
-    this.setState({ tableHeight })
+    setTimeout(() => {
+      console.log(this.props.tableHeightNum)
+    }, 0)
+    // window.addEventListener('resize', this.handleResize.bind(this))
+    // let tableHeight = window.document.body.clientHeight - 273
+    // this.setState({ tableHeight })
   }
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.handleResize.bind(this))
-  }
-  // 浏览器窗口大小改变事件
-  handleResize = e => {
-    let tableHeight = e.target.innerHeight - 313
-    this.setState({ tableHeight })
-  }
+  // componentWillUnmount () {
+  //   window.removeEventListener('resize', this.handleResize.bind(this))
+  // }
+  // // 浏览器窗口大小改变事件
+  // handleResize = e => {
+  //   let tableHeight = e.target.innerHeight - 313
+  //   this.setState({ tableHeight })
+  // }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
@@ -197,7 +204,7 @@ class MetadataTableList extends PureComponent {
             rowSelection={rowSelection}
             pagination={false}
             className='smallSizeTable'
-            scroll={{ y: this.state.tableHeight }}
+            scroll={{ y: this.props.tableHeightNum - 270 }}
             rowKey='currentTableId'
             onChange={this.handleTableChange}
             dataSource={this.state.data}
@@ -310,7 +317,8 @@ class MetadataTableList extends PureComponent {
 }
 MetadataTableList.propTypes = {
   match: PropTypes.object,
-  history: PropTypes.object
+  history: PropTypes.object,
+  tableHeightNum: PropTypes.number
 }
 const formItemSettings = {
   labelCol: { span: 5 },
@@ -418,4 +426,7 @@ AddMetadata.propTypes = {
 }
 
 const WrappedForm = Form.create()(AddMetadata)
-export default MetadataTableList
+
+export default connect(
+  mapStateToProps
+)(MetadataTableList)

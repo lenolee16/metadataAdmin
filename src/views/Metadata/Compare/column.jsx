@@ -1,12 +1,16 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
 import { Card, Button, Input, Form, Switch, Modal, Table, Tag, Radio, Popover, Icon } from 'antd'
+import { connect } from 'react-redux'
 import Ellipsis from 'components/Ellipsis'
 import utils from 'utils'
 
 const { Search } = Input
 const { Column, ColumnGroup } = Table
 
+const mapStateToProps = state => ({
+  tableHeightNum: state.tableHeight.tableHeightNum
+})
 class MetadataColumnList extends PureComponent {
   constructor (props) {
     super(props)
@@ -27,18 +31,21 @@ class MetadataColumnList extends PureComponent {
   }
   componentDidMount () {
     this.queryData()
-    window.addEventListener('resize', this.handleResize.bind(this))
-    let tableHeight = window.document.body.clientHeight - 273
-    this.setState({ tableHeight })
+    setTimeout(() => {
+      console.log(this.props.tableHeightNum)
+    }, 0)
+    // window.addEventListener('resize', this.handleResize.bind(this))
+    // let tableHeight = window.document.body.clientHeight - 273
+    // this.setState({ tableHeight })
   }
-  componentWillUnmount () {
-    window.removeEventListener('resize', this.handleResize.bind(this))
-  }
-  // 浏览器窗口大小改变事件
-  handleResize = e => {
-    let tableHeight = e.target.innerHeight - 313
-    this.setState({ tableHeight })
-  }
+  // componentWillUnmount () {
+  //   window.removeEventListener('resize', this.handleResize.bind(this))
+  // }
+  // // 浏览器窗口大小改变事件
+  // handleResize = e => {
+  //   let tableHeight = e.target.innerHeight - 313
+  //   this.setState({ tableHeight })
+  // }
   queryData () {
     const { params: { databaseId, id } } = this.props.match
     this.setState({ loading: true })
@@ -142,7 +149,7 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: this.state.tableHeight }} >
+          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: this.props.tableHeightNum - 270 }} >
             <Column
               title='字段名称'
               dataIndex='targetFieldName'
@@ -256,7 +263,8 @@ class MetadataColumnList extends PureComponent {
 }
 
 MetadataColumnList.propTypes = {
-  match: PropTypes.object
+  match: PropTypes.object,
+  tableHeightNum: PropTypes.number
 }
 
 const formItemSettings = {
@@ -418,4 +426,6 @@ AddMetadata.propTypes = {
 
 const WrappedForm = Form.create()(AddMetadata)
 
-export default MetadataColumnList
+export default connect(
+  mapStateToProps
+)(MetadataColumnList)
