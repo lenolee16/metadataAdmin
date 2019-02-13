@@ -18,8 +18,8 @@ class Login extends PureComponent {
   componentDidMount () {
     document.addEventListener('keypress', this.handleEnterKey)
   }
-  componentWillUmount () {
-    document.removeEventListener('keypress', this.handleEenterKey)
+  componentWillUnmount () {
+    document.removeEventListener('keypress', this.handleEnterKey)
   }
   handleEnterKey = (e) => {
     if (e.keyCode === 13) {
@@ -34,7 +34,7 @@ class Login extends PureComponent {
       return window._message.error('请输入密码！')
     }
     if (this.state.user === 'admin' && this.state.password === 'admin') {
-      this.loginSuccess()
+      setTimeout(() => { this.loginSuccess() }, 300)
       window._message.success('登录成功！')
     } else {
       window._message.error('用户名或者密码错误！')
