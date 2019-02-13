@@ -1,17 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
 import { renderRoutes } from 'react-router-config'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux'
 import { Layout, Spin } from 'antd'
 import { routes } from 'routes'
 import LeftMenu from 'components/Layout/LeftMenu/index'
 import Headers from 'components/Layout/Header/index'
+import { tableHeight } from '$redux/actions'
 import './MainView.less'
 
 const { Sider, Content, Header } = Layout
 
 const mapStateToProps = state => ({
-  loading: state.loading.globalLoading
+  loading: state.loading.globalLoading,
+  tableHeightNum: state.tableHeight.tableHeightNum
+})
+
+const mapDispatchToProps = dispatch => ({
+  tableHeight: bindActionCreators(tableHeight, dispatch)
 })
 
 class MainView extends React.PureComponent {
@@ -21,6 +28,29 @@ class MainView extends React.PureComponent {
       collapsed: false,
       userName: 'admin'
     }
+  }
+  componentDidMount () {
+    window.addEventListener('resize', this.handleResize.bind(this))
+    // let tableHeight = window.document.body.clientHeight - 263
+    // console.log(tableHeight)
+    // this.props.tableHeight(window.document.body.clientHeight)
+    // console.log(window.document.body.clientHeight)
+    // console.log(this.props.tableHeightNum)
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.handleResize.bind(this))
+  }
+  // 浏览器窗口大小改变事件
+  handleResize = e => {
+    console.log('改变开始')
+    // let tableHeight = e.target.innerHeight - 223
+    // console.log(tableHeight)
+    this.props.tableHeight(e.target.innerHeight)
+    console.log(e.target.innerHeight)
+    setTimeout(() => {
+      console.log('----')
+      console.log(this.props.tableHeightNum)
+    }, 0)
   }
   render () {
     return (
@@ -46,9 +76,12 @@ class MainView extends React.PureComponent {
 
 MainView.propTypes = {
   location: PropTypes.object,
-  loading: PropTypes.bool
+  loading: PropTypes.bool,
+  tableHeightNum: PropTypes.number,
+  tableHeight: PropTypes.func
 }
 
 export default connect(
-  mapStateToProps
+  mapStateToProps,
+  mapDispatchToProps
 )(MainView)

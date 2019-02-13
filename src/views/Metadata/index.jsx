@@ -1,11 +1,15 @@
 import React, { PureComponent } from 'react'
 import PropTypes from 'prop-types'
+import { connect } from 'react-redux'
 import { Card, Table, Button, Input, Modal, Form, Select, Switch } from 'antd'
 import utils from 'utils'
 import Ellipsis from 'components/Ellipsis'
 
 const { Column } = Table
 const { Search } = Input
+const mapStateToProps = state => ({
+  tableHeightNum: state.tableHeight.tableHeightNum
+})
 class Metadata extends PureComponent {
   constructor (props) {
     super(props)
@@ -20,6 +24,9 @@ class Metadata extends PureComponent {
   }
   componentDidMount () {
     this.initData()
+    setTimeout(() => {
+      console.log(this.props.tableHeightNum)
+    }, 0)
     window.addEventListener('resize', this.handleResize.bind(this))
     let tableHeight = window.document.body.clientHeight - 263
     this.setState({ tableHeight })
@@ -238,7 +245,9 @@ class Metadata extends PureComponent {
     )
   }
 }
-
+Metadata.propTypes = {
+  tableHeightNum: PropTypes.number
+}
 const formItemSettings = {
   labelCol: { span: 5 },
   wrapperCol: { span: 12 }
@@ -392,4 +401,7 @@ AddMetadata.propTypes = {
 
 const WrappedForm = Form.create()(AddMetadata)
 
-export default Metadata
+// export default Metadata
+export default connect(
+  mapStateToProps
+)(Metadata)

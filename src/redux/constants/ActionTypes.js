@@ -1,3 +1,4 @@
 export const INCREMENT = 'INCREMENT'
 export const SHOW_LOADING = 'SHOW_LOADING'
 export const HIDE_LOADING = 'HIDE_LOADING'
+export const TABLE_HEIGHT = 'TABLE_HEIGHT'
