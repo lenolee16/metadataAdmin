@@ -1,13 +1,13 @@
 import { TABLE_HEIGHT } from '../constants/ActionTypes'
 
-const tableHeight = {
+const initialState = {
   tableHeightNum: window.document.body.clientHeight
 }
 
-export default function tableHeightFunc (state = tableHeight, action) {
+export default function tableHeightFunc (state = initialState, action) {
   switch (action.type) {
     case TABLE_HEIGHT:
-      return { tableHeightNum: state.tableHeightNum }
+      return { tableHeightNum: action.num }
     default:
       return state
   }
