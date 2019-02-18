@@ -1,6 +1,6 @@
 import React, { PureComponent, Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Radio, InputNumber } from 'antd'
+import { Card, Table, Button, Input, Form, Modal, Tag, Switch, Select, Radio, InputNumber } from 'antd'
 import utils from 'utils'
 import { connect } from 'react-redux'
 import Ellipsis from 'components/Ellipsis'
@@ -98,7 +98,8 @@ class MetadataTableList extends PureComponent {
     }
     this.setState({ visible: true })
     setTimeout(() => {
-      this.form.setData(data.targetTable)
+      // 这两个字段是前台添加的假数据，后期会删除的
+      this.form.setData(Object.assign(data.targetTable, { syncIncrFlag: 0, syncIncrField: '' }))
     }, 0)
   }
   // 传入表单回调
@@ -329,6 +330,15 @@ class AddMetadata extends Component {
   constructor (props) {
     super(props)
     this.splitFlag = 0
+    this.syncIncrFlag = 0
+    this.fields = []
+  }
+  componentDidMount () {
+    this.getFields()
+  }
+  getFields = () => {
+    this.fields = [1, 2]
+    console.log('请求表字段')
   }
   handleSubmit = (e) => {
     e.preventDefault()
@@ -339,17 +349,23 @@ class AddMetadata extends Component {
       }
     })
   }
+  getSelectField = (data) => {
+    return data.map((v, i) => <Select.Option key={i} value={v}>{v}</Select.Option>)
+  }
   setData (data) {
     data.status = !!data.status
-    const { targetTableId, status, splitFlag, splitNum } = data
+    console.log(data)
+    const { targetTableId, status, splitFlag, splitNum, syncIncrFlag, syncIncrField } = data
     const targetTableComment = data.targetComment || ''
+    this.syncIncrFlag = syncIncrFlag
     this.splitFlag = splitFlag
-    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status, splitFlag, splitNum })
+    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status, splitFlag, splitNum, syncIncrFlag, syncIncrField })
   }
   radioFunc (e) {
-    console.log(e.target)
     this.splitFlag = e.target.value
-    console.log(this.splitFlag)
+  }
+  fieldFunc (e) {
+    this.syncIncrFlag = e.target.value
   }
   render () {
     const { getFieldDecorator } = this.props.form
@@ -398,6 +414,35 @@ class AddMetadata extends Component {
               message: '请输入分库数且为整数' }]
           })(
             <InputNumber min={1 + this.splitFlag} max={this.splitFlag ? 1000 : 1} disabled={!this.splitFlag} />
+          )}
+        </Form.Item>
+        <Form.Item
+          label='是否增量同步'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('syncIncrFlag', {
+            initialValue: 0
+          })(
+            <Radio.Group onChange={e => this.fieldFunc(e)} >
+              <Radio value={1}>是</Radio>
+              <Radio value={0}>否</Radio>
+            </Radio.Group>
+          )}
+        </Form.Item>
+        <Form.Item
+          label='增量字段'
+          {...formItemSettings}
+        >
+          {getFieldDecorator('syncIncrField', {
+            rules: [{ required: this.syncIncrFlag,
+              message: '请选择增量字段' }]
+          })(
+            <Select
+              placeholder='请选择数据库类型'
+              disabled={!this.syncIncrFlag}
+            >
+              {this.getSelectField(this.fields)}
+            </Select>
           )}
         </Form.Item>
         <Form.Item
