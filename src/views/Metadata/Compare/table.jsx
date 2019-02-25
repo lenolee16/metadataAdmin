@@ -30,21 +30,7 @@ class MetadataTableList extends PureComponent {
     // 拿到上个页面传递过来的源id
     this.setState({ dataSourceId: this.props.match.params.databaseId })
     this.initData()
-    setTimeout(() => {
-      console.log(this.props.tableHeightNum)
-    }, 0)
-    // window.addEventListener('resize', this.handleResize.bind(this))
-    // let tableHeight = window.document.body.clientHeight - 273
-    // this.setState({ tableHeight })
   }
-  // componentWillUnmount () {
-  //   window.removeEventListener('resize', this.handleResize.bind(this))
-  // }
-  // // 浏览器窗口大小改变事件
-  // handleResize = e => {
-  //   let tableHeight = e.target.innerHeight - 313
-  //   this.setState({ tableHeight })
-  // }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
@@ -93,13 +79,11 @@ class MetadataTableList extends PureComponent {
   // 修改
   amend = (data) => {
     if (data.targetTable && data.targetTable.targetTableId === null) {
-      // return window._message.error('目标表id不存在，无法修改！')
       return false
     }
     this.setState({ visible: true })
     setTimeout(() => {
-      // 这两个字段是前台添加的假数据，后期会删除的
-      this.form.setData(Object.assign(data.targetTable, { syncIncrFlag: 0, syncIncrField: '' }))
+      this.form.setData(Object.assign(data.targetTable))
     }, 0)
   }
   // 传入表单回调
@@ -151,7 +135,6 @@ class MetadataTableList extends PureComponent {
   // 导出选中数据表
   export = () => {
     if (this.selectData.length > 0) {
-      console.log(this.selectData)
       const { params: { databaseId } } = this.props.match
       const tableIds = this.selectData.map(item => item.targetTable.targetTableId).join(',')
       utils.loading.show()
@@ -333,12 +316,14 @@ class AddMetadata extends Component {
     this.syncIncrFlag = 0
     this.fields = []
   }
-  componentDidMount () {
-    this.getFields()
-  }
-  getFields = () => {
-    this.fields = [1, 2]
-    console.log('请求表字段')
+  getFields = (data) => {
+    window._http.post('/metadata/targetField/listByTableId', { targetTableId: data.targetTableId }).then(res => {
+      if (res.data.code === 0) {
+        this.fields = res.data.data
+      } else {
+        window._message.error(res.data.msg)
+      }
+    })
   }
   handleSubmit = (e) => {
     e.preventDefault()
@@ -354,7 +339,7 @@ class AddMetadata extends Component {
   }
   setData (data) {
     data.status = !!data.status
-    console.log(data)
+    this.getFields(data)
     const { targetTableId, status, splitFlag, splitNum, syncIncrFlag, syncIncrField } = data
     const targetTableComment = data.targetComment || ''
     this.syncIncrFlag = syncIncrFlag
@@ -366,6 +351,7 @@ class AddMetadata extends Component {
   }
   fieldFunc (e) {
     this.syncIncrFlag = e.target.value
+    e.target.value === 0 && this.props.form.setFieldsValue({ 'syncIncrField': '' })
   }
   render () {
     const { getFieldDecorator } = this.props.form
