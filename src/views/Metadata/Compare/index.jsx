@@ -89,6 +89,21 @@ class MetadataList extends PureComponent {
       utils.loading.hide()
     })
   }
+  // 导出exportExcel表
+  exportExcel = (data) => {
+    utils.loading.show()
+    window._http.post('/metadata/datasource/exportSchema', { dataSourceId: data.dataSourceId }).then(res => {
+      utils.loading.hide()
+      if (res.data.code === 0) {
+        window._message.success(res.data.msg)
+        window.open('about:blank').location.href = res.data.data
+      } else {
+        window._message.error(res.data.msg)
+      }
+    }).catch(res => {
+      utils.loading.hide()
+    })
+  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -190,7 +205,8 @@ class MetadataList extends PureComponent {
                   <>
                     <Link to={`/metadataList/${record.dataSourceId}`}><Button type='primary' size='small' ghost icon='search' style={{ marginRight: '10px', marginBottom: '5px' }} >查看</Button></Link>
                     <Button type='danger' size='small' ghost icon='sync' onClick={() => this.sync(record)} style={{ marginRight: '10px', marginBottom: '5px' }} >同步</Button>
-                    <Button type='primary' size='small' ghost icon='export' onClick={() => this.export(record)}>导出</Button>
+                    <Button type='primary' size='small' ghost icon='export' onClick={() => this.export(record)} style={{ marginRight: '10px', marginBottom: '5px' }}>脚本</Button>
+                    <Button type='primary' size='small' ghost icon='export' onClick={() => this.exportExcel(record)}>Excel</Button>
                   </>
               )}
             />
