@@ -77,11 +77,12 @@ class MetadataList extends PureComponent {
   // 导出数据源
   export = (data) => {
     utils.loading.show()
+    const a = window.open('about:blank')
     window._http.post('/metadata/sqoop/exportDB', { dataSourceId: data.dataSourceId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success(res.data.msg)
-        window.open('about:blank').location.href = res.data.data
+        a.location.href = res.data.data
       } else {
         window._message.error(res.data.msg)
       }
@@ -92,11 +93,12 @@ class MetadataList extends PureComponent {
   // 导出exportExcel表
   exportExcel = (data) => {
     utils.loading.show()
+    const a = window.open('about:blank')
     window._http.post('/metadata/datasource/exportSchema', { dataSourceId: data.dataSourceId }).then(res => {
       utils.loading.hide()
       if (res.data.code === 0) {
         window._message.success(res.data.msg)
-        window.open('about:blank').location.href = res.data.data
+        a.location.href = res.data.data
       } else {
         window._message.error(res.data.msg)
       }
@@ -104,6 +106,7 @@ class MetadataList extends PureComponent {
       utils.loading.hide()
     })
   }
+
   render () {
     return (
       <div className='MetadataSearch'>
