@@ -25,11 +25,11 @@ class LeftMenu extends React.Component {
           selectKey = item.path
           openKey = subkey
         }
-        return (item.children && Array.isArray(item.children) && hasChildren(item.children)) ? <Menu.SubMenu key={item.path} title={<><Icon type={item.icon} />{item.name}</>} >
+        return (item.children && Array.isArray(item.children) && hasChildren(item.children)) ? <Menu.SubMenu key={item.id} title={<span><Icon type={item.icon} /><span>{item.name}</span></span>} >
           {renderMenu(item.children, item.id)}
         </Menu.SubMenu> : <Menu.Item key={item.path}>
           <Link to={item.path} replace={this.props.location.pathname === item.path}>
-            <Icon type={item.icon} />
+            {item.icon && <Icon type={item.icon} />}
             <span>{item.name}</span>
           </Link>
         </Menu.Item>
@@ -42,6 +42,7 @@ class LeftMenu extends React.Component {
         defaultOpenKeys={[openKey]}
         mode='inline'
         theme='dark'
+        inlineCollapsed={this.props.collapsed}
       >
         {menu}
       </Menu>
@@ -50,7 +51,8 @@ class LeftMenu extends React.Component {
 }
 
 LeftMenu.propTypes = {
-  location: PropTypes.object
+  location: PropTypes.object,
+  collapsed: PropTypes.bool
 }
 
 export default LeftMenu

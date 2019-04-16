@@ -1,46 +1,75 @@
 [
   {
-    "id": "3",
-    "name": "数据源管理",
-    "icon": "setting",
+    "id": "1",
+    "name": "元数据管理",
+    "icon": "hdd",
     "inMenu": true,
     "isMenu": true,
-    "path": "/metadataManage"
-  },
-  {
-    "id": "4",
-    "name": "数据源同步",
-    "icon": "diff",
-    "inMenu": true,
-    "isMenu": true,
-    "path": "/metadataList",
     "children": [
       {
-        "id": "41",
-        "name": "数据表",
-        "icon": "",
-        "inMenu": false,
-        "isMenu": false,
-        "path": "/metadataList/:id",
+        "id": "13",
+        "name": "数据源管理",
+        "inMenu": true,
+        "isMenu": true,
+        "path": "/metadataManage"
+      },
+      {
+        "id": "14",
+        "name": "数据源同步",
+        "inMenu": true,
+        "isMenu": true,
+        "path": "/metadataList",
         "children": [
           {
-            "id": "411",
-            "name": "数据列",
+            "id": "141",
+            "name": "数据表",
             "icon": "",
             "inMenu": false,
             "isMenu": false,
-            "path": "/metadataList/:id/:id"
+            "path": "/metadataList/:id",
+            "children": [
+              {
+                "id": "1411",
+                "name": "数据列",
+                "icon": "",
+                "inMenu": false,
+                "isMenu": false,
+                "path": "/metadataList/:id/:id"
+              }
+            ]
           }
         ]
+      },
+      {
+        "id": "15",
+        "name": "快捷搜索",
+        "inMenu": true,
+        "isMenu": true,
+        "path": "/metadataSearch"
       }
     ]
   },
   {
-    "id": "5",
-    "name": "快捷搜索",
-    "icon": "search",
+    "id": "2",
+    "name": "业务源数据",
+    "icon": "read",
     "inMenu": true,
     "isMenu": true,
-    "path": "/metadataSearch"
+    "children": [
+      {
+        "id": "21",
+        "name": "数据列表",
+        "inMenu": true,
+        "isMenu": true,
+        "path": "/businessMeta"
+      },
+      {
+        "id": "22",
+        "name": "业务模块管理",
+        "inMenu": true,
+        "isMenu": true,
+        "path": "/businessMenu"
+      }
+    ]
   }
 ]

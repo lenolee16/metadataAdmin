@@ -13,7 +13,8 @@ import './MainView.less'
 const { Sider, Content, Header } = Layout
 
 const mapStateToProps = state => ({
-  loading: state.loading.globalLoading
+  loading: state.loading.globalLoading,
+  collapsed: state.common.collapsed
 })
 
 const mapDispatchToProps = dispatch => ({
@@ -24,7 +25,6 @@ class MainView extends React.PureComponent {
   constructor (props) {
     super(props)
     this.state = {
-      collapsed: false,
       userName: 'admin'
     }
   }
@@ -42,19 +42,19 @@ class MainView extends React.PureComponent {
   render () {
     return (
       <Layout className='app'>
-        <Sider>
+        <Sider collapsed={this.props.collapsed}>
           <div className='logo'>元数据管理平台</div>
-          <LeftMenu location={this.props.location} />
+          <LeftMenu collapsed={this.props.collapsed} location={this.props.location} />
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: '#fff' }} >
             <Headers />
           </Header>
-          <Spin spinning={this.props.loading}>
-            <Content className='app-content'>
+          <Content className='app-content'>
+            <Spin wrapperClassName='app-spin' spinning={this.props.loading}>
               {renderRoutes(routes)}
-            </Content>
-          </Spin>
+            </Spin>
+          </Content>
         </Layout>
       </Layout>
     )
@@ -65,7 +65,8 @@ MainView.propTypes = {
   location: PropTypes.object,
   loading: PropTypes.bool,
   // tableHeightNum: PropTypes.number,
-  tableHeight: PropTypes.func
+  tableHeight: PropTypes.func,
+  collapsed: PropTypes.bool
 }
 
 export default connect(

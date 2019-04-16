@@ -24,21 +24,7 @@ class Metadata extends PureComponent {
   }
   componentDidMount () {
     this.initData()
-    setTimeout(() => {
-      console.log(this.props.tableHeightNum)
-    }, 0)
-    // window.addEventListener('resize', this.handleResize.bind(this))
-    // let tableHeight = window.document.body.clientHeight - 263
-    // this.setState({ tableHeight })
   }
-  // componentWillUnmount () {
-  //   window.removeEventListener('resize', this.handleResize.bind(this))
-  // }
-  // // 浏览器窗口大小改变事件
-  // handleResize = e => {
-  //   let tableHeight = e.target.innerHeight - 223
-  //   this.setState({ tableHeight })
-  // }
   filter = (val) => {
     if (!val) {
       return this.setState({ data: this.data })
@@ -140,6 +126,7 @@ class Metadata extends PureComponent {
           <Table
             rowKey='dataSourceId'
             pagination={false}
+            size='small'
             className='smallSizeTable'
             scroll={{ y: this.props.tableHeightNum - 270 }}
             dataSource={this.state.data}

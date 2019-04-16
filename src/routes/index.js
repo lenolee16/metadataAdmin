@@ -9,6 +9,9 @@ import MetadataSearch from 'views/Metadata/Search'
 import MetadataList from 'views/Metadata/Compare'
 import MetadataTableList from 'views/Metadata/Compare/table'
 import MetadataColumnList from 'views/Metadata/Compare/column'
+
+import BusinessMeta from 'views/BusinessMeta'
+import BusinessMenu from 'views/BusinessMeta/menu'
 import authHOC from 'utils/auth'
 
 // https://reactjs.org/docs/code-splitting.html#suspense
@@ -46,6 +49,14 @@ const routes = [
   {
     path: '/metadataSearch',
     component: MetadataSearch
+  },
+  {
+    path: '/businessMeta',
+    component: BusinessMeta
+  },
+  {
+    path: '/businessMenu',
+    component: BusinessMenu
   },
   {
     path: '/async',

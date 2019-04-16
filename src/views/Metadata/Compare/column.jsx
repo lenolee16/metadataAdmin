@@ -34,18 +34,7 @@ class MetadataColumnList extends PureComponent {
     setTimeout(() => {
       console.log(this.props.tableHeightNum)
     }, 0)
-    // window.addEventListener('resize', this.handleResize.bind(this))
-    // let tableHeight = window.document.body.clientHeight - 273
-    // this.setState({ tableHeight })
   }
-  // componentWillUnmount () {
-  //   window.removeEventListener('resize', this.handleResize.bind(this))
-  // }
-  // // 浏览器窗口大小改变事件
-  // handleResize = e => {
-  //   let tableHeight = e.target.innerHeight - 313
-  //   this.setState({ tableHeight })
-  // }
   queryData () {
     const { params: { databaseId, id } } = this.props.match
     this.setState({ loading: true })
@@ -149,7 +138,7 @@ class MetadataColumnList extends PureComponent {
               style={{ width: 200 }}
             />
           </div>
-          <Table rowKey='targetFieldName' bordered pagination={false} onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: this.props.tableHeightNum - 270 }} >
+          <Table rowKey='targetFieldName' bordered pagination={false} size='small' onChange={this.handleTableChange} dataSource={this.state.data} loading={this.state.loading} className='smallSizeTable' scroll={{ y: this.props.tableHeightNum - 270 }} >
             <Column
               title='字段名称'
               dataIndex='targetFieldName'

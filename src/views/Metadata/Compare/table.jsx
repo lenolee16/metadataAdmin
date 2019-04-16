@@ -185,6 +185,7 @@ class MetadataTableList extends PureComponent {
           <Table
             bordered
             ref='table'
+            size='small'
             rowSelection={rowSelection}
             pagination={false}
             className='smallSizeTable'

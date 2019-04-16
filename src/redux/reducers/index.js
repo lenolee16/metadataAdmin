@@ -1,10 +1,10 @@
 import { combineReducers } from 'redux'
-import counter from './counter'
+import common from './common'
 import loading from './loading'
 import tableHeight from './tableHeight'
 
 export default combineReducers({
-  counter,
+  common,
   loading,
   tableHeight
 })
