@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
-import { Card, Row, Col, Menu, Tree, Table, Input, Button, Icon, Tabs, Drawer, Empty, Tooltip, Tag, Popover } from 'antd'
+import PropTypes from 'prop-types'
+import { Card, Row, Col, Menu, Tree, Table, Input, Button, Icon, Tabs, Drawer, Empty, Tag, Popover, Dropdown, Modal, Divider, Select, AutoComplete, Tooltip } from 'antd'
 import Highlighter from 'react-highlight-words'
-import { deepClone, debounce } from 'utils/utils'
+import { deepClone, debounce, platChildrenTree, getAllPath } from 'utils/utils'
 import utils from 'utils/'
 import Ellipsis from 'components/Ellipsis'
 
@@ -12,11 +13,171 @@ const { TreeNode } = Tree
 const { TabPane } = Tabs
 const { Search } = Input
 
+class LinkNode extends Component {
+  constructor (props) {
+    super(props)
+    this.state = {
+      data: [],
+      sourceList: [],
+      targetList: []
+    }
+  }
+  getList (source, target, data) {
+    if (!source) {
+      return
+    }
+    const sourceData = {
+      dataSourceId: source.dataSourceId,
+      menuId: this.props.menuId,
+      tableName: source.tableName
+    }
+    const targetData = {
+      dataSourceId: target.dataSourceId,
+      menuId: this.props.menuId,
+      tableName: target.tableName
+    }
+    if (data) {
+      this.setState({
+        data: data.map(item => {
+          return {
+            sourceFieldName: item.fieldName,
+            targetFieldName: item.foreignfieldName,
+            id: item.id
+          }
+        })
+      })
+    } else {
+      this.setState({ data: [{ sourceFieldName: '', targetFieldName: '', _edit: true }] })
+    }
+    window._http.post('/metadata/ods/tableFieldMeta', sourceData).then(res => {
+      if (res.data.code === 0) {
+        this.setState({ sourceList: res.data.data })
+      }
+    })
+    window._http.post('/metadata/ods/tableFieldMeta', targetData).then(res => {
+      if (res.data.code === 0) {
+        this.setState({ targetList: res.data.data })
+      }
+    })
+  }
+  handleChange = (value, index, key) => {
+    let data = [...this.state.data]
+    data[index][key] = value
+    this.setState({ data: data })
+  }
+  addRow = () => {
+    this.setState((prevState) => ({
+      data: prevState.data.concat({ sourceFieldName: '', targetFieldName: '', _edit: true })
+    }))
+  }
+  edit = (index) => {
+    let data = [...this.state.data]
+    data[index]._edit = true
+    this.setState({ data: data })
+  }
+  save = (record, index) => {
+    if (!record.sourceFieldName) {
+      return window._message.error('请选择从表字段')
+    }
+    if (!record.targetFieldName) {
+      return window._message.error('请选择主表字段')
+    }
+    const formData = {
+      dataSourceId: this.props.source.dataSourceId,
+      fieldName: record.sourceFieldName,
+      id: record.id,
+      menuId: this.props.menuId,
+      tableName: this.props.source.tableName,
+      foreignTableName: this.props.target.tableName,
+      foreignfieldName: record.targetFieldName
+    }
+    window._http.post(`${record.id ? '/metadata/ods/updateForegeinkey' : '/metadata/ods/setForegeinkey'}`, formData).then(res => {
+      if (res.data.code === 0) {
+        window._message.success('保存成功')
+        let data = [...this.state.data]
+        data[index]._edit = false
+        data[index].id = record.id || res.data.data
+        this.setState({ data: data })
+        this.props.fresh()
+      } else {
+        window._message.error(res.data.msg || '保存失败')
+      }
+    })
+  }
+  delete = (record, index) => {
+    if (record.id) {
+      // 如果存在id则代表保存过，需要请求后再删除
+      const formData = {
+        dataSourceId: this.props.source.dataSourceId,
+        fieldName: record.sourceFieldName,
+        id: record.id,
+        menuId: this.props.menuId,
+        tableName: this.props.source.tableName,
+        foreignTableName: this.props.target.tableName,
+        foreignfieldName: record.targetFieldName
+      }
+      window._http.post('/metadata/ods/delForegeinkey', formData).then(res => {
+        if (res.data.code === 0) {
+          window._message.success('删除成功')
+          let data = [...this.state.data]
+          data.splice(index, 1)
+          this.setState({ data: data })
+          this.props.fresh()
+        } else {
+          window._message.error(res.data.msg || '删除失败')
+        }
+      })
+    } else {
+      // 否则可以直接删除该行
+      let data = [...this.state.data]
+      data.splice(index, 1)
+      this.setState({ data: data })
+    }
+  }
+  render () {
+    const { modalVisible, source, target, handleModalVisible } = this.props
+    return (
+      <Modal title='关联数据表字段' destroyOnClose width={900} footer={null} visible={modalVisible} onCancel={handleModalVisible}>
+        <p>从表：{source && source.tableName}</p>
+        <p>主表：{target && target.tableName}</p>
+        <Button size='small' type='primary' icon='plus' onClick={this.addRow}>新增</Button>
+        <Table rowKey={(record, index) => `${index}-${record.id}`} pagination={false} dataSource={this.state.data} size='small' style={{ marginTop: '10px' }}>
+          <Table.Column key='index' title='序号' width={40} render={(text, record, index) => `${index + 1}`} />
+          <Table.Column key='operation' title='操作' width={100} render={(text, record, index) => (<span>
+            {
+              record._edit ? <a href='javascript:;' onClick={() => this.save(record, index)}>保存</a> : <a href='javascript:;' onClick={() => this.edit(index)}>编辑</a>
+            }
+            <Divider type='vertical' />
+            <a href='javascript:;' onClick={() => this.delete(record, index)}>删除</a>
+          </span>)} />
+          <Table.Column key='sourceFieldName' width={300} dataIndex='sourceFieldName' title='从表字段' render={(text, record, index) => (<Select style={{ width: '100%' }} showSearch disabled={!record._edit || !!record.id} size='small' value={text} onChange={(value) => this.handleChange(value, index, 'sourceFieldName')}>
+            {this.state.sourceList.map(item => <Select.Option key={item.name} value={item.name}>{item.name}({item.comment})</Select.Option>)}
+          </Select>)} />
+          <Table.Column key='targetFieldName' width={300} dataIndex='targetFieldName' title='主表字段' render={(text, record, index) => (<Select style={{ width: '100%' }} showSearch disabled={!record._edit} size='small' value={text} onChange={(value) => this.handleChange(value, index, 'targetFieldName')}>
+            {this.state.targetList.map(item => <Select.Option key={item.name} value={item.name}>{item.name}({item.comment})</Select.Option>)}
+          </Select>)} /> />
+        </Table>
+      </Modal>
+    )
+  }
+}
+
+LinkNode.propTypes = {
+  modalVisible: PropTypes.bool,
+  source: PropTypes.any,
+  target: PropTypes.any,
+  menuId: PropTypes.string,
+  handleModalVisible: PropTypes.func,
+  fresh: PropTypes.func
+}
+
 class BusinessMeta extends Component {
   constructor (props) {
     super(props)
-    this.treeRef = React.createRef()
     this.handleFilter = debounce(this.onDrawerFilterChange.bind(this), 300)
+    this.resizeHaddler = debounce(this.queryTableWrapper.bind(this), 300)
+    this.linkNode = React.createRef()
+    this.menuData = []
     this.state = {
       data: [],
       menu: [],
@@ -27,20 +188,40 @@ class BusinessMeta extends Component {
       expandedKeys: [],
       menuId: '',
       menuName: '',
+      openKeys: [],
       selectTable: '',
       selectTableInfo: {},
       selectTableFields: [],
+      selectTableMaster: null,
+      scollY: 0,
       visible: false,
       loading: false,
       fieldLoading: false,
       submitLoading: false,
       menuLoading: false,
-      drawerVisible: false
+      drawerVisible: false,
+      linkNodeModal: false,
+      setNode: null,
+      targetNode: null,
+      filterMenuText: ''
     }
   }
   componentDidMount () {
     this.queryMenu()
     this.queryAllTables()
+    window.addEventListener('resize', this.resizeHaddler)
+  }
+  componentWillUnmount () {
+    window.removeEventListener('resize', this.resizeHaddler)
+  }
+  queryTableWrapper () {
+    const tableWrapper = document.querySelector('.tableWrapper')
+    if (tableWrapper) {
+      const tableWrapperHeight = tableWrapper.clientHeight
+      if (this.state.scollY !== tableWrapperHeight - 100) {
+        this.setState({ scollY: tableWrapperHeight - 100 })
+      }
+    }
   }
   queryAllTables () {
     window._http.post('/metadata/ods/tableList').then(res => {
@@ -56,7 +237,7 @@ class BusinessMeta extends Component {
     window._http.post('/metadata/ods/menuList').then(res => {
       this.setState({ menuLoading: false })
       if (res.data.code === 0) {
-        this.menuData = res.data.data
+        this.menuData = platChildrenTree(res.data.data)
         this.setState({ menu: res.data.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
@@ -76,6 +257,29 @@ class BusinessMeta extends Component {
       })
     }
     return _renderMenu(data)
+  }
+  filterMenu = (inputValue, option) => {
+    return inputValue && this.state.filterMenuText ? option.props.children.toUpperCase().indexOf(inputValue.toUpperCase()) !== -1 : false
+  }
+  selectFilterMenu = (value, option) => {
+    // 选择搜索菜单
+    if (this.state.menuId !== value) {
+      const item = option.props.item
+      this.setState({
+        menuId: item.id,
+        menuName: item.name,
+        selectTable: '',
+        selectTableFields: [],
+        selectTableInfo: {},
+        selectedKeys: []
+      })
+      this.queryMenuUsed(item.id)
+      const keys = getAllPath(item.id, this.state.menu).map(path => path.id)
+      this.setState({ openKeys: keys })
+    }
+  }
+  onOpenChange = (key) => {
+    this.setState({ openKeys: key })
   }
   menuClick = (item) => {
     // 点击业务菜单，获取关联数据表，并设置当前选中的menuId,以及名称
@@ -104,70 +308,79 @@ class BusinessMeta extends Component {
   }
   renderMenuUsed () {
     // 生成关联数据表
-    return this.state.useTable.map(item => <TreeNode
-      title={<div className={`treeItem ${item.masterFlag ? 'treeItemPrimary' : ''}`}>{`${item.tableName}（`}<Ellipsis style={{ maxWidth: '80px' }} content={item.comment} />）{this.renderPrimaryButton(item)}</div>}
-      key={`${item.dataSourceId}|${item.tableName}`} />
+    const relationshipTree = []
+    const list = deepClone(this.state.useTable)
+    const renderRelationship = (data) => { // 生成主从关系
+      data.forEach(item => { // 生成主表
+        if (!item.masters) {
+          relationshipTree.push({ ...item, children: [] })
+        }
+      })
+      relationshipTree.forEach(item => { // 生成主表的从表
+        data.forEach(i => {
+          if (i.tableName !== item.tableName && i.masters) {
+            let hasLink = i.masters.some(node => node.foreignTableName === item.tableName)
+            if (hasLink) {
+              item.children.push(i)
+            }
+          }
+        })
+      })
+    }
+    renderRelationship(list)
+    return this.renderMenuNode(relationshipTree)
+  }
+  renderMenuNode (data) { // 生成表的树状图
+    return data.map(item => <TreeNode
+      data={item}
+      title={<div className={`treeItem`}>{`${item.tableName}（`}<Ellipsis style={{ maxWidth: '80px' }} content={item.comment} />）{this.renderPrimaryButton(item)}</div>}
+      key={`${item.dataSourceId}|${item.tableName}`}>
+      { item.children && item.children.length ? this.renderMenuNode(item.children) : '' }
+    </TreeNode>
     )
   }
   renderPrimaryButton (node) {
-    const hasPrimary = this.state.useTable.some(item => item.masterFlag)
-    if (!hasPrimary) {
-      return <Tooltip placement='top' title='设为主表'><Button size='small' type='dashed' shape='circle' icon='cluster' onClick={($event) => this.setTablePrimary($event, node)} /></Tooltip>
-    }
-    if (hasPrimary && node.masterFlag) {
-      return <Tooltip placement='top' title='取消主表'><Button size='small' type='dashed' shape='circle' icon='disconnect' onClick={($event) => this.cancelTablePrimary($event, node)} /></Tooltip>
-    }
-    return ''
+    return <span onClick={(e) => e.stopPropagation()}><Dropdown size='small' overlay={this.renderOther(node)}><a className='ant-dropdown-link'>关联<Icon type='down' /></a></Dropdown></span>
   }
-  setTablePrimary = (e, node) => {
-    e.stopPropagation()
-    const formData = {
-      'dataSourceId': node.dataSourceId,
-      'menuId': this.state.menuId,
-      'tableName': node.tableName
-    }
-    utils.loading.show()
-    window._http.post('/metadata/ods/setMainTable', formData).then(res => {
-      utils.loading.hide()
-      if (res.data.code === 0) {
-        window._message.success('设置成功！')
-        this.queryMenuUsed(this.state.menuId)
-      } else {
-        window._message.error(res.data.msg || '设置失败')
-      }
-    }).catch(() => utils.loading.hide())
+  renderOther (node) { // 生成除当前表以外的 下拉表集合
+    let nodeList = deepClone(this.state.useTable)
+    let _index = nodeList.findIndex(item => item.dataSourceId === node.dataSourceId && item.tableName === node.tableName)
+    nodeList.splice(_index, 1)
+    return (
+      <Menu>
+        {
+          nodeList.map(item => <Menu.Item key={`${item.dataSourceId}|${item.tableName}`}>
+            <a onClick={(e) => this.setTableLink(e, node, item)}>{item.tableName}</a>
+          </Menu.Item>
+          )
+        }
+      </Menu>
+    )
   }
-  cancelTablePrimary = (e, node) => {
-    e.stopPropagation()
-    const formData = {
-      'dataSourceId': node.dataSourceId,
-      'menuId': this.state.menuId,
-      'tableName': node.tableName
-    }
-    utils.loading.show()
-    window._http.post('/metadata/ods/unsetMainTable', formData).then(res => {
-      utils.loading.hide()
-      if (res.data.code === 0) {
-        window._message.success('取消成功！')
-        this.queryMenuUsed(this.state.menuId)
-      } else {
-        window._message.error(res.data.msg || '取消失败')
-      }
-    }).catch(() => utils.loading.hide())
+  setTableLink = (e, node, linkNode) => { // 点击表关联
+    const list = node.masters ? node.masters.filter(item => linkNode.dataSourceId === item.dataSourceId && linkNode.tableName === item.foreignTableName) : null
+    this.setState({ linkNodeModal: true, setNode: node, targetNode: linkNode }, () => {
+      this.linkNode.current.getList(node, linkNode, list) // 获取两个表的字段列表
+    })
   }
-  selectTable = (selectedKeys) => {
+  handleModalVisible = () => {
+    this.setState({ linkNodeModal: false })
+  }
+  selectTable = (selectedKeys, option) => {
     // 选择关联数据表
-    console.log(selectedKeys)
     if (selectedKeys.length > 0 && selectedKeys[0] !== this.state.selectTable) {
-      this.setState({ selectTable: selectedKeys[0] })
+      const node = option.node.props.data
+      this.setState({ selectTable: selectedKeys[0], selectTableMaster: node.masters })
       const [dataSourceId, tableName] = selectedKeys[0].split('|')
       this.dataSourceId = dataSourceId
       this.tableName = tableName
       this.queryTableInfo(dataSourceId, tableName)
       this.queryTableFields(dataSourceId, tableName)
+      this.queryTableWrapper()
     }
   }
   queryTableInfo (dataSourceId, tableName) {
+    // 查询表详情
     window._http.post('/metadata/ods/tableMeta', { dataSourceId, tableName }).then(res => {
       if (res.data.code === 0) {
         this.setState({ selectTableInfo: res.data.data })
@@ -177,6 +390,7 @@ class BusinessMeta extends Component {
     })
   }
   queryTableFields (dataSourceId, tableName) {
+    // 查询表的字段
     this.setState({ fieldLoading: true })
     window._http.post('/metadata/targetField/compareFieldByName', { dataSourceId, tableName, menuId: this.state.menuId }).then(res => {
       this.setState({ fieldLoading: false })
@@ -187,7 +401,7 @@ class BusinessMeta extends Component {
       }
     }).catch(() => this.setState({ fieldLoading: false }))
   }
-  getColumnSearchProps = (dataIndex) => ({
+  getColumnSearchProps = (dataIndex) => ({ // 字段搜索
     filterDropdown: ({
       setSelectedKeys, selectedKeys, confirm, clearFilters
     }) => (
@@ -318,13 +532,6 @@ class BusinessMeta extends Component {
 
   renderTreeNodes = data => data.map((item) => {
     // 生成数据库列表
-    // if (item.children) {
-    //   return (
-    //     <TreeNode title={`${item.tableName}（${item.dbName}）`} key={`${item.dataSourceId}|${item.tableName}`} dataRef={item}>
-    //       {this.renderFieldTreeNodes(item.children, item)}
-    //     </TreeNode>
-    //   )
-    // }
     return <TreeNode title={`${item.tableName}（${item.dbName}）`} key={`${item.dataSourceId}|${item.tableName}`} dataRef={item} />
   })
 
@@ -334,7 +541,6 @@ class BusinessMeta extends Component {
   })
 
   selectField = (selectedKeys) => {
-    console.log(selectedKeys)
     this.setState({ selectedKeys })
   }
 
@@ -348,7 +554,7 @@ class BusinessMeta extends Component {
     this.setState({ allTable: treeData })
   }
 
-  unbindField = (record) => {
+  unbindField = (record) => { // 移除字段
     const data = {
       fieldName: record.name,
       menuId: this.state.menuId,
@@ -385,6 +591,21 @@ class BusinessMeta extends Component {
 
   render () {
     const columns = [{
+      title: '主表字段',
+      key: 'linkFieldName',
+      width: '15%',
+      render: (text, record) => {
+        if (this.state.selectTableMaster) {
+          let node = this.state.selectTableMaster.find(item => record.targetFieldName && item.fieldName === record.targetFieldName)
+          if (node) {
+            return <Tooltip title={node.foreignTableName}>{node.foreignfieldName}</Tooltip>
+          }
+          return ''
+        } else {
+          return ''
+        }
+      }
+    }, {
       title: '字段名称',
       dataIndex: 'targetFieldName',
       key: 'targetFieldName',
@@ -423,6 +644,10 @@ class BusinessMeta extends Component {
       key: 'currentToTarget',
       render: (text, record) => <Tag color={this.renderColor(text)}>{record.currentToTargetTxt}</Tag>
     }]
+    let children = ''
+    if (this.state.filterMenuText) {
+      children = this.menuData.filter(item => item.menuPath.toUpperCase().indexOf(this.state.filterMenuText.toUpperCase()) !== -1).map(item => <AutoComplete.Option size='small' item={item} key={item.id} value={item.id}>{item.menuPath}</AutoComplete.Option>)
+    }
     return (
       <div className='BusinessMeta'>
         <Row gutter={8} style={{ height: '100%' }}>
@@ -433,14 +658,33 @@ class BusinessMeta extends Component {
               className='BusinessMetaMenu'
               loading={this.state.menuLoading}
             >
-              <Menu
-                className='sub-menu'
-                mode='inline'
-                inlineIndent={12}
-                onClick={this.menuClick}
+              <AutoComplete
+                style={{ width: '100%', fontSize: '12px' }}
+                size='small'
+                defaultActiveFirstOption
+                allowClear
+                backfill
+                placeholder='输入名称搜索'
+                defaultOpen={false}
+                dropdownStyle={{ fontSize: '12px', lineHeight: '21px' }}
+                onSelect={this.selectFilterMenu}
+                onSearch={(value) => this.setState({ filterMenuText: value })}
               >
-                {this.renderMenu(this.state.menu)}
-              </Menu>
+                {children}
+              </AutoComplete>
+              <div className='sub-menu-container'>
+                <Menu
+                  className='sub-menu'
+                  mode='inline'
+                  inlineIndent={12}
+                  selectedKeys={[this.state.menuId]}
+                  openKeys={this.state.openKeys}
+                  onOpenChange={this.onOpenChange}
+                  onClick={this.menuClick}
+                >
+                  {this.renderMenu(this.state.menu)}
+                </Menu>
+              </div>
             </Card>
           </Col>
           <Col span={20} style={{ height: '100%' }}>
@@ -451,10 +695,11 @@ class BusinessMeta extends Component {
               extra={this.state.menuId && <a onClick={this.addTable}><Icon type='plus' />关联表</a>}
             >
               {
-                this.state.useTable.length ? <Row>
-                  <Col span={7}>
+                this.state.useTable.length ? <Row style={{ height: '100%' }}>
+                  <Col span={8} style={{ height: '100%' }}>
                     {
                       <Tree
+                        defaultExpandAll
                         className='useTable'
                         showLine
                         onSelect={this.selectTable}
@@ -463,11 +708,11 @@ class BusinessMeta extends Component {
                       </Tree>
                     }
                   </Col>
-                  <Col span={17}>
+                  <Col span={16} style={{ height: '100%' }} className='tableWrapper'>
                     {
                       this.state.selectTable ? <Tabs type='card'>
                         <TabPane tab='表字段' key='1'>
-                          <Table rowKey='targetFieldName' pagination={{ pageSize: 10 }} columns={columns} dataSource={this.state.selectTableFields} size='small' loading={this.state.fieldLoading} />
+                          <Table rowKey='targetFieldName' scroll={this.state.scollY ? { y: this.state.scollY } : false} pagination={false} columns={columns} dataSource={this.state.selectTableFields} size='small' loading={this.state.fieldLoading} />
                         </TabPane>
                         <TabPane tab='表信息' key='2'>
                           <div>
@@ -485,6 +730,7 @@ class BusinessMeta extends Component {
             </Card>
           </Col>
         </Row>
+        <LinkNode menuId={this.state.menuId} modalVisible={this.state.linkNodeModal} source={this.state.setNode} target={this.state.targetNode} handleModalVisible={this.handleModalVisible} ref={this.linkNode} fresh={() => this.queryMenuUsed(this.state.menuId)} />
         <Drawer
           title='新增表'
           width={400}
