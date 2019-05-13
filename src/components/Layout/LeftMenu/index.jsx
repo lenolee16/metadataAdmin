@@ -16,6 +16,16 @@ class LeftMenu extends React.Component {
       openKey: null
     }
   }
+  click = (a, b) => {
+    if (!a || !b) return
+    let path = b
+    let name = null
+    console.log('点击了路由', a, b)
+    console.log(menuData[a - 1].children.forEach(item => {
+      if (item.path === b) name = item.name
+    }))
+    console.log(path, name)
+  }
   render () {
     let { selectKey, openKey } = this.state
     let renderMenu = (list, subkey) => {
@@ -41,6 +51,7 @@ class LeftMenu extends React.Component {
         defaultSelectedKeys={[selectKey]}
         defaultOpenKeys={[openKey]}
         mode='inline'
+        onClick={this.click(openKey, selectKey)}
         theme='dark'
         inlineCollapsed={this.props.collapsed}
       >
