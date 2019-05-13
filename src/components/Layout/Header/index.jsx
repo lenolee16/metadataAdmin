@@ -66,7 +66,7 @@ class Header extends PureComponent {
   render () {
     return (
       <>
-        <div style={{ height: '64px', width: '100%', lineHeight: '64px' }}>
+        <div style={{ height: '64px', width: '100%', lineHeight: '64px', padding: '0 10px' }}>
           <div className='toggle-menu'>
             <Icon
               className='trigger'

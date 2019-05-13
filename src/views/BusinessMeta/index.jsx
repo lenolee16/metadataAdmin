@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import PropTypes from 'prop-types'
-import { Card, Row, Col, Menu, Tree, Table, Input, Button, Icon, Tabs, Drawer, Empty, Tag, Popover, Dropdown, Modal, Divider, Select, AutoComplete, Tooltip } from 'antd'
+import { Card, Row, Col, Menu, Tree, Table, Input, Button, Icon, Tabs, Drawer, Empty, Tag, Popover, Dropdown, Modal, Divider, Select, AutoComplete, Tooltip, Switch } from 'antd'
 import Highlighter from 'react-highlight-words'
 import { deepClone, debounce, platChildrenTree, getAllPath } from 'utils/utils'
 import utils from 'utils/'
@@ -203,7 +203,8 @@ class BusinessMeta extends Component {
       linkNodeModal: false,
       setNode: null,
       targetNode: null,
-      filterMenuText: ''
+      filterMenuText: '',
+      isUat: true
     }
   }
   componentDidMount () {
@@ -589,6 +590,13 @@ class BusinessMeta extends Component {
     )
   }
 
+  // 过滤数据拿到不同类别的数据
+  setData = (bool, data) => {
+    let arr = data || this.state.data
+    arr = arr.map(item => item.bool === bool)
+    this.setData({ data: arr })
+  }
+
   render () {
     const columns = [{
       title: '主表字段',
@@ -738,7 +746,12 @@ class BusinessMeta extends Component {
           visible={this.state.drawerVisible}
         >
           <h2 style={{ fontSize: '14px', color: '#666' }}>选择数据字段</h2>
-          <Search style={{ marginBottom: 8 }} placeholder='搜索表名' onChange={this.handleOnSearch} />
+          <div>
+            <div style={{ display: 'inline-block', width: '55px', marginRight: '10px' }}>
+              <Switch checkedChildren='UAT' unCheckedChildren='PRO' defaultChecked onChange={e => this.setState({ isUat: e })} />
+            </div>
+            <Search style={{ marginBottom: 8, width: '80%' }} placeholder='搜索表名' onChange={this.handleOnSearch} />
+          </div>
           {
             this.state.allTable.length > 0 ? <Tree
               checkable
