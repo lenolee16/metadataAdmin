@@ -34,7 +34,9 @@ class Header extends PureComponent {
   }
   getPanes () {
     const panes = [
-      <TabPane tab='首页' key='/' />
+      <TabPane tab='首页' key='/' />,
+      <TabPane tab='页面1' key='/1' />,
+      <TabPane tab='页面2' key='/2' />
     ]
     this.setState({ panes })
   }
@@ -83,7 +85,6 @@ class Header extends PureComponent {
         <div style={{ height: '30px', width: '100%', background: '#E8E8E8', lineHeight: '30px' }}>
           <Tabs
             hideAdd
-            size='small'
             type='editable-card'
             onEdit={this.onEdit}
             onChange={this.onChange}
