@@ -1,5 +1,5 @@
 import React, { PureComponent } from 'react'
-import { Card, Table, Button, Input } from 'antd'
+import { Card, Table, Button, Input, Switch } from 'antd'
 import { Link } from 'react-router-dom'
 import utils from 'utils'
 import PropTypes from 'prop-types'
@@ -18,7 +18,8 @@ class MetadataList extends PureComponent {
     this.state = {
       data: [],
       visible: false,
-      loading: false
+      loading: false,
+      displayFlag: 1
     }
   }
   componentDidMount () {
@@ -37,7 +38,8 @@ class MetadataList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.filter(item => item.status === 1)
-        this.setState({ data: this.data })
+        this.setDataFilter(this.state.displayFlag)
+        // this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
       }
@@ -92,7 +94,14 @@ class MetadataList extends PureComponent {
       utils.loading.hide()
     })
   }
-
+  // 过滤数据拿到不同类别的数据
+  setDataFilter = (bool) => {
+    if (bool) {
+      this.setState({ data: this.data, displayFlag: bool })
+    } else {
+      this.setState({ data: this.data.filter(item => item.displayFlag === 1), displayFlag: bool })
+    }
+  }
   render () {
     return (
       <div className='MetadataSearch'>
@@ -104,6 +113,9 @@ class MetadataList extends PureComponent {
               onSearch={this.filter}
               style={{ width: 200 }}
             />
+            <div className='fr' style={{ display: 'inline-block', width: '80px', marginRight: '10px', marginTop: '5px' }}>
+              <Switch checkedChildren='显示所有' unCheckedChildren='显示所有' defaultChecked onChange={(e) => this.setDataFilter(e)} />
+            </div>
           </div>
           <Table
             rowKey='dataSourceId'

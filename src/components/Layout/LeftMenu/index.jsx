@@ -1,13 +1,24 @@
 import React from 'react'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
 import { Menu, Icon } from 'antd'
 import { hasChildren } from 'utils/matchRoute'
 import menuData from './data.json'
+import { bindActionCreators } from 'redux'
+import { connect } from 'react-redux'
+import { TABS_PAGE } from '$redux/actions'
 
 const isActive = (path, location) => {
   return location.pathname.indexOf(path) === 0
 }
+
+const mapStateToProps = state => ({
+  tabsPage: state.tabsPage.tabs
+})
+
+const mapDispatchToProps = dispatch => ({
+  toggle: bindActionCreators(TABS_PAGE, dispatch)
+})
+
 class LeftMenu extends React.Component {
   constructor (props) {
     super(props)
@@ -16,15 +27,14 @@ class LeftMenu extends React.Component {
       openKey: null
     }
   }
-  click = (a, b) => {
-    if (!a || !b) return
-    let path = b
-    let name = null
-    console.log('点击了路由', a, b)
-    console.log(menuData[a - 1].children.forEach(item => {
-      if (item.path === b) name = item.name
-    }))
-    console.log(path, name)
+  click = (obj) => {
+    // const { children, eventKey } = obj.item.props
+    const { eventKey } = obj.item.props
+    // const arr = this.props.tabsPage
+    // if (arr.some(e => e.path === eventKey)) return
+    // arr.push({ name: children, path: eventKey })
+    // this.props.toggle(arr)
+    this.props.history.push(eventKey)
   }
   render () {
     let { selectKey, openKey } = this.state
@@ -35,14 +45,11 @@ class LeftMenu extends React.Component {
           selectKey = item.path
           openKey = subkey
         }
-        return (item.children && Array.isArray(item.children) && hasChildren(item.children)) ? <Menu.SubMenu key={item.id} title={<span><Icon type={item.icon} /><span>{item.name}</span></span>} >
-          {renderMenu(item.children, item.id)}
-        </Menu.SubMenu> : <Menu.Item key={item.path}>
-          <Link to={item.path} replace={this.props.location.pathname === item.path}>
-            {item.icon && <Icon type={item.icon} />}
-            <span>{item.name}</span>
-          </Link>
-        </Menu.Item>
+        return (item.children && Array.isArray(item.children) && hasChildren(item.children)) ? <Menu.SubMenu key={item.id} title={<span><Icon type={item.icon} /><span>{item.name}</span></span>
+        }>{renderMenu(item.children, item.id)}</Menu.SubMenu>
+          : <Menu.Item onClick={this.click} key={item.path}>
+            {item.name}
+          </Menu.Item>
       })
     }
     const menu = renderMenu(menuData)
@@ -51,7 +58,6 @@ class LeftMenu extends React.Component {
         defaultSelectedKeys={[selectKey]}
         defaultOpenKeys={[openKey]}
         mode='inline'
-        onClick={this.click(openKey, selectKey)}
         theme='dark'
         inlineCollapsed={this.props.collapsed}
       >
@@ -63,7 +69,13 @@ class LeftMenu extends React.Component {
 
 LeftMenu.propTypes = {
   location: PropTypes.object,
-  collapsed: PropTypes.bool
+  collapsed: PropTypes.bool,
+  history: PropTypes.object
+  // tabsPage: PropTypes.array,
+  // toggle: PropTypes.func
 }
 
-export default LeftMenu
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+)(LeftMenu)

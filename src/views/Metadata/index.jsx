@@ -19,7 +19,8 @@ class Metadata extends PureComponent {
       data: [],
       visible: false,
       loading: false,
-      formDataId: null
+      formDataId: null,
+      displayFlag: 1
     }
   }
   componentDidMount () {
@@ -38,7 +39,8 @@ class Metadata extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data
-        this.setState({ data: this.data })
+        this.setDataFilter(this.state.displayFlag)
+        // this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg || '查询失败')
       }
@@ -56,6 +58,7 @@ class Metadata extends PureComponent {
     })
     if (this.state.formDataId !== null) {
       values.status = values.status ? 1 : 0
+      values.displayFlag = values.displayFlag ? 1 : 0
       window._http.post('/metadata/dataSource/update', values).then(res => {
         if (res.data.code === 0) {
           this.initData()
@@ -108,6 +111,14 @@ class Metadata extends PureComponent {
       utils.loading.hide()
     })
   }
+  // 过滤数据拿到不同类别的数据
+  setDataFilter = (bool) => {
+    if (bool) {
+      this.setState({ data: this.data, displayFlag: bool })
+    } else {
+      this.setState({ data: this.data.filter(item => item.displayFlag === 1), displayFlag: bool })
+    }
+  }
   render () {
     return (
       <div className='User'>
@@ -122,6 +133,9 @@ class Metadata extends PureComponent {
               onSearch={this.filter}
               style={{ width: 200 }}
             />
+            <div className='fr' style={{ display: 'inline-block', width: '80px', marginRight: '10px', marginTop: '5px' }}>
+              <Switch checkedChildren='显示所有' unCheckedChildren='显示所有' defaultChecked onChange={(e) => this.setDataFilter(e)} />
+            </div>
           </div>
           <Table
             rowKey='dataSourceId'
@@ -256,10 +270,11 @@ class AddMetadata extends PureComponent {
     data.status = !!data.status
     data.dbType = '' + data.dbType
     const { dataSourceId, title, dbName, hiveDbName, description, dbType, jdbcUrl, password, status, user } = data
+    let displayFlag = !!data.displayFlag
     if (this.props.formDataId === null) {
-      this.props.form.setFieldsValue({ title, dbName, hiveDbName, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ displayFlag, title, dbName, hiveDbName, description, dbType, jdbcUrl, password, status, user })
     } else {
-      this.props.form.setFieldsValue({ dataSourceId, dbName, hiveDbName, title, description, dbType, jdbcUrl, password, status, user })
+      this.props.form.setFieldsValue({ displayFlag, dataSourceId, dbName, hiveDbName, title, description, dbType, jdbcUrl, password, status, user })
     }
   }
   render () {
@@ -367,6 +382,14 @@ class AddMetadata extends PureComponent {
           label='状态'
         >
           {getFieldDecorator('status', { valuePropName: 'checked', initialValue: true })(
+            <Switch />
+          )}
+        </Form.Item>
+        <Form.Item
+          {...formItemSettings}
+          label='是否显示'
+        >
+          {getFieldDecorator('displayFlag', { valuePropName: 'checked', initialValue: true })(
             <Switch />
           )}
         </Form.Item>

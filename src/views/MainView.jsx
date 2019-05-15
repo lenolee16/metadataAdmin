@@ -44,11 +44,11 @@ class MainView extends React.PureComponent {
       <Layout className='app'>
         <Sider collapsed={this.props.collapsed}>
           <div className='logo'>元数据管理平台</div>
-          <LeftMenu collapsed={this.props.collapsed} location={this.props.location} />
+          <LeftMenu {...this.props} />
         </Sider>
         <Layout>
           <Header style={{ backgroundColor: '#fff' }} >
-            <Headers />
+            <Headers {...this.props} />
           </Header>
           <Content className='app-content'>
             <Spin wrapperClassName='app-spin' spinning={this.props.loading}>

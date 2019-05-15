@@ -183,6 +183,10 @@ class BusinessMeta extends Component {
       menu: [],
       useTable: [],
       allTable: [],
+      // 库名
+      allLibrary: [],
+      dataSourceId: '',
+      dataSourceName: '',
       selectedKeys: [],
       currentSelectedKeys: [],
       expandedKeys: [],
@@ -204,12 +208,15 @@ class BusinessMeta extends Component {
       setNode: null,
       targetNode: null,
       filterMenuText: '',
-      isUat: true
+      displayFlag: 1,
+      displayFlagLibrary: 1,
+      TableLoading: false
     }
   }
   componentDidMount () {
     this.queryMenu()
-    this.queryAllTables()
+    // this.queryAllTables()
+    this.queryAllLibrary()
     window.addEventListener('resize', this.resizeHaddler)
   }
   componentWillUnmount () {
@@ -224,11 +231,25 @@ class BusinessMeta extends Component {
       }
     }
   }
-  queryAllTables () {
-    window._http.post('/metadata/ods/tableList').then(res => {
+  queryAllTables = () => {
+    this.setState({ TableLoading: true })
+    window._http.post('/metadata/ods/tableList', { dataSourceId: this.state.dataSourceId }).then(res => {
       if (res.data.code === 0) {
         this._allTable = res.data.data
-        this.setState({ allTable: res.data.data })
+        this.setDataTable(this.state.displayFlag)
+        this.setState({ TableLoading: false })
+      } else {
+        window._message.error(res.data.msg || '查询失败')
+        this.setState({ TableLoading: false })
+      }
+    })
+  }
+  // 查询库名
+  queryAllLibrary () {
+    window._http.post('/metadata/ods/dbList').then(res => {
+      if (res.data.code === 0) {
+        this._allLibrary = res.data.data
+        this.setDataLibrary(this.state.displayFlagLibrary)
       } else {
         window._message.error(res.data.msg || '查询失败')
       }
@@ -551,7 +572,7 @@ class BusinessMeta extends Component {
   }
 
   onDrawerFilterChange = value => {
-    const treeData = this._allTable.filter(item => item.tableName.includes(value))
+    const treeData = this._allTable ? this._allTable.filter(item => item.tableName.includes(value)) : []
     this.setState({ allTable: treeData })
   }
 
@@ -591,10 +612,19 @@ class BusinessMeta extends Component {
   }
 
   // 过滤数据拿到不同类别的数据
-  setData = (bool, data) => {
-    let arr = data || this.state.data
-    arr = arr.map(item => item.bool === bool)
-    this.setData({ data: arr })
+  setDataLibrary = (bool) => {
+    bool = bool ? 1 : 0
+    console.log(bool)
+    this.setState({ allLibrary: this._allLibrary.filter(item => item.displayFlag === bool), displayFlagLibrary: bool })
+  }
+  setDataTable = (bool) => {
+    bool = bool ? 1 : 0
+    this.setState({ allLibrary: this._allTable.filter(item => item.displayFlag === bool), displayFlagLibrary: bool })
+  }
+  handleChange = (e) => {
+    let obj = this.state.allLibrary.find(item => item.dataSourceId === +e)
+    console.log(obj)
+    this.setState({ dataSourceName: obj.dbName, dataSourceId: obj.dataSourceId })
   }
 
   render () {
@@ -747,10 +777,28 @@ class BusinessMeta extends Component {
         >
           <h2 style={{ fontSize: '14px', color: '#666' }}>选择数据字段</h2>
           <div>
-            <div style={{ display: 'inline-block', width: '55px', marginRight: '10px' }}>
-              <Switch checkedChildren='UAT' unCheckedChildren='PRO' defaultChecked onChange={e => this.setState({ isUat: e })} />
+            <div style={{ display: 'inline-block', minWidth: '60px', marginRight: '10px' }}>
+              库：
+              <Switch checkedChildren='显示' unCheckedChildren='隐藏' defaultChecked onChange={e => this.setDataLibrary(e)} />
             </div>
-            <Search style={{ marginBottom: 8, width: '80%' }} placeholder='搜索表名' onChange={this.handleOnSearch} />
+            <Select
+              placeholder='库名'
+              value={this.state.dataSourceName}
+              onChange={this.handleChange}
+              style={{ width: '45%' }}
+            >
+              {this.state.allLibrary.map(item => (
+                <Select.Option key={item.dataSourceId}>
+                  {item.dbName}
+                </Select.Option>
+              ))}
+            </Select>
+            <Button style={{ marginLeft: '10px', marginBottom: '5px' }} type='primary' onClick={this.queryAllTables} icon='search' loading={this.state.TableLoading}>搜索</Button>
+            <div style={{ display: 'inline-block', minWidth: '60px', marginRight: '10px' }}>
+              表：
+              <Switch checkedChildren='显示' unCheckedChildren='隐藏' defaultChecked onChange={e => this.setDataTable(e)} />
+            </div>
+            <Search style={{ marginBottom: 8, width: '70%' }} placeholder='搜索表名' onChange={this.handleOnSearch} />
           </div>
           {
             this.state.allTable.length > 0 ? <Tree

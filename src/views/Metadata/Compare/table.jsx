@@ -21,7 +21,8 @@ class MetadataTableList extends PureComponent {
       dataSourceId: null,
       loading: false,
       filteredInfo: null,
-      tableHeight: 600
+      tableHeight: 600,
+      displayFlag: 1
     }
   }
   componentDidMount () {
@@ -45,7 +46,8 @@ class MetadataTableList extends PureComponent {
       this.setState({ loading: false })
       if (res.data.code === 0) {
         this.data = res.data.data.dataList
-        this.setState({ data: this.data })
+        this.setFilter(this.state.displayFlag)
+        // this.setState({ data: this.data })
       } else {
         window._message.error(res.data.msg)
       }
@@ -90,6 +92,7 @@ class MetadataTableList extends PureComponent {
   handleOk = (data) => {
     this.setState({ visible: false, loading: true })
     data.status = data.status ? 1 : 0
+    data.displayFlag = data.displayFlag ? 1 : 0
     window._http.post('/metadata/targetTable/update', data).then(res => {
       this.setState({ loading: false })
       if (res.data.code === 0) {
@@ -153,6 +156,14 @@ class MetadataTableList extends PureComponent {
       window._message.error('请选择需要导出的表')
     }
   }
+  // 过滤数据拿到不同类别的数据
+  setFilter = (bool) => {
+    if (bool) {
+      this.setState({ data: this.data, displayFlag: bool })
+    } else {
+      this.setState({ data: this.data.filter(item => item.targetTable === null || item.targetTable.displayFlag === 1), displayFlag: bool })
+    }
+  }
   render () {
     const filters = [
       { text: '无变化', value: 0 },
@@ -181,6 +192,9 @@ class MetadataTableList extends PureComponent {
               onSearch={this.filter}
               style={{ width: 200 }}
             />
+            <div className='fr' style={{ display: 'inline-block', width: '80px', marginRight: '10px', marginTop: '5px' }}>
+              <Switch checkedChildren='显示所有' unCheckedChildren='显示所有' defaultChecked onChange={(e) => this.setFilter(e)} />
+            </div>
           </div>
           <Table
             bordered
@@ -342,10 +356,11 @@ class AddMetadata extends Component {
     data.status = !!data.status
     this.getFields(data)
     const { targetTableId, status, splitFlag, splitNum, syncIncrFlag, syncIncrField } = data
+    let displayFlag = !!data.displayFlag
     const targetTableComment = data.targetComment || ''
     this.syncIncrFlag = syncIncrFlag
     this.splitFlag = splitFlag
-    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status, splitFlag, splitNum, syncIncrFlag, syncIncrField })
+    this.props.form.setFieldsValue({ targetTableId, targetTableComment, status, splitFlag, splitNum, syncIncrFlag, syncIncrField, displayFlag })
   }
   radioFunc (e) {
     this.splitFlag = e.target.value
@@ -396,7 +411,7 @@ class AddMetadata extends Component {
         >
           {getFieldDecorator('splitNum', {
             initialValue: 1,
-            rules: [{ required: true,
+            rules: this.splitFlag === 0 ? [] : [{ required: true,
               pattern: new RegExp(/^[1-9]\d*$/, 'g'),
               message: '请输入分库数且为整数' }]
           })(
@@ -437,6 +452,14 @@ class AddMetadata extends Component {
           label='启用状态'
         >
           {getFieldDecorator('status', { valuePropName: 'checked', initialValue: true })(
+            <Switch />
+          )}
+        </Form.Item>
+        <Form.Item
+          {...formItemSettings}
+          label='是否显示'
+        >
+          {getFieldDecorator('displayFlag', { valuePropName: 'checked', initialValue: true })(
             <Switch />
           )}
         </Form.Item>
