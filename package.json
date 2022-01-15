@@ -86,7 +86,7 @@
     "react-hot-loader": "^4.3.12",
     "react-test-renderer": "^16.6.3",
     "semver": "^5.6.0",
-    "shelljs": "^0.8.3",
+    "shelljs": "^0.8.5",
     "style-loader": "^0.23.1",
     "uglifyjs-webpack-plugin": "^2.0.1",
     "url-loader": "^1.1.2",
